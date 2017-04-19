@@ -32,15 +32,11 @@ public class ReadActivity extends Activity {
       setContentView(R.layout.activity_read);
       presenter = new ReadPresenter(this);
       ButterKnife.bind(this);
-      presenter.loadChapter();
-      presenter.getChapter();
       LinearLayoutManager LayoutManager = new LinearLayoutManager(this);
       chapterRecyclerView.setLayoutManager(LayoutManager);
-   }
-
-   public void setChapterRecyclerView(Elements chapterItems) {
-      chapterRecyclerView.setAdapter(new ChapterAdapter(chapterItems));
-      presenter.saveChapter();
+      chapterRecyclerView.setAdapter(presenter.getChapterAdapter());
+      presenter.loadChapter();
+      presenter.getChapter();
    }
 
    @OnClick(R.id.next_button)
@@ -75,6 +71,9 @@ public class ReadActivity extends Activity {
       alert.show();
       input.requestFocus();
       imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+   }
 
+   public void setChapter(Elements chapterItems) {
+      chapterRecyclerView.setAdapter(new ChapterAdapter(chapterItems));
    }
 }

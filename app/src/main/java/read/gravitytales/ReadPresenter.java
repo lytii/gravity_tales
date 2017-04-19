@@ -1,143 +1,74 @@
 package read.gravitytales;
 
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.jsoup.select.Elements;
 
+import static android.content.ContentValues.TAG;
+
 public class ReadPresenter {
+
    ReadActivity readActivity;
-   final Network network = new Network();
-   int chapter = 112;
+   ChapterAdapter chapterAdapter;
+
+   Network network;
+   int chapterNumber = 112;
 
    public ReadPresenter(ReadActivity readActivity) {
       this.readActivity = readActivity;
+      chapterAdapter = new ChapterAdapter(new Elements());
+      network = new Network(this);
    }
 
    public void saveChapter() {
       SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(readActivity);
       sharedPreferences.edit()
-                       .putInt("Chapter", chapter)
+                       .putInt("Chapter", chapterNumber)
                        .apply();
+      Toast.makeText(readActivity, "Chapter " + chapterNumber, Toast.LENGTH_SHORT);
    }
 
    public void loadChapter() {
       SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(readActivity);
-      chapter = sharedPreferences.getInt("Chapter", 111);
+      chapterNumber = sharedPreferences.getInt("Chapter", 111);
    }
 
    public void getChapter() {
-      new AsyncTask<Object, Object, Elements>() {
-         @Override
-         protected Elements doInBackground(Object... voids) {
-            try {
-               return network.getChapter(chapter);
-            } catch (Exception e) {
-
-               e.printStackTrace();
-            }
-            return null;
-         }
-
-         @Override
-         protected void onPostExecute(Elements chapterItems) {
-            Log.d("ReadPresenter", "loaded chapter");
-            readActivity.setChapterRecyclerView(chapterItems);
-         }
-      }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+      network.addChapter(chapterNumber);
    }
 
-   public void getChapter(final int chapterNumber) {
-      chapter = chapterNumber;
-      new AsyncTask<Object, Object, Elements>() {
-         @Override
-         protected Elements doInBackground(Object... voids) {
-            try {
-               return network.getChapter(chapterNumber);
-            } catch (Exception e) {
-
-               e.printStackTrace();
-            }
-            return null;
-         }
-
-         @Override
-         protected void onPostExecute(Elements chapterItems) {
-            Log.d("ReadPresenter", "loaded chapter");
-            readActivity.setChapterRecyclerView(chapterItems);
-         }
-      }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+   public void getChapter(int chapterNumber) {
+      this.chapterNumber = chapterNumber;
+      network.addChapter(chapterNumber);
    }
 
    public void nextChapter() {
-      chapter++;
-      new AsyncTask<Object, Object, Elements>() {
-         @Override
-         protected Elements doInBackground(Object... voids) {
-            try {
-               return network.nextChapter();
-            } catch (Exception e) {
-
-               e.printStackTrace();
-            }
-            return null;
-         }
-
-         @Override
-         protected void onPostExecute(Elements chapterItems) {
-            Log.d("ReadPresenter", "loaded chapter");
-            readActivity.setChapterRecyclerView(chapterItems);
-         }
-      }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+      Log.d(TAG, "nextChapter: ");
+      network.getChapter(++chapterNumber);
    }
 
    public void prevChapter() {
-      chapter--;
-      new AsyncTask<Object, Object, Elements>() {
-         @Override
-         protected Elements doInBackground(Object... voids) {
-            try {
-               return network.prevChapter();
-            } catch (Exception e) {
-
-               e.printStackTrace();
-            }
-            return null;
-         }
-
-         @Override
-         protected void onPostExecute(Elements chapterItems) {
-            Log.d("ReadPresenter", "loaded chapter");
-            readActivity.setChapterRecyclerView(chapterItems);
-         }
-      }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+      Log.d(TAG, "prevChapter: ");
+      network.getChapter(--chapterNumber);
    }
 
-   public void getChapterDRY() {
-      new AsyncTask<Object, Object, Elements>() {
-         @Override
-         protected Elements doInBackground(Object... voids) {
-            try {
-               return network.prevChapter();
-            } catch (Exception e) {
-
-               e.printStackTrace();
-            }
-            return null;
-         }
-
-         @Override
-         protected void onPostExecute(Elements chapterItems) {
-            Log.d("ReadPresenter", "loaded chapter");
-            readActivity.setChapterRecyclerView(chapterItems);
-         }
-      }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+   // set items to new adapter, refreshes view
+   public void setItems(Elements chapterItems) {
+      readActivity.setChapter(chapterItems);
+      saveChapter();
    }
 
-   public void prevChapterDRY() {
-      chapter--;
+   // adds items to list, adds chapters to view
+   public void updateItems(Elements chapterItems) {
+      chapterAdapter.addAll(chapterItems);
+      chapterAdapter.notifyDataSetChanged();
+      saveChapter();
+   }
 
+   public ChapterAdapter getChapterAdapter(){
+      return chapterAdapter;
    }
 }

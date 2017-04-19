@@ -1,45 +1,87 @@
 package read.gravitytales;
 
+import android.os.AsyncTask;
+import android.util.Log;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
+import static android.content.ContentValues.TAG;
+
 public class Network {
    private static String BASE_NOVEL_URL = "/novel/the-experimental-log-of-the-crazy-lich/elcl-chapter-";
-   private static String NEXT_CHAPTER_CSS = "[href]:contains(Next Chapter)";
-   private static String PREV_CHAPTER_CSS = "[href]:contains(Previous Chapter)";
    private static String BASE_URL = "http://gravitytales.com";
-
+   private int chapterNumber;
    private static Document toParse;
-   private static String novelUrl;
+   ReadPresenter callback;
 
-   public Network(String novelUrl) {
-      this.novelUrl = novelUrl;
+   public Network(ReadPresenter callback) {
+      this.callback = callback;
    }
 
-   public Network() {
-      novelUrl = "/novel/the-experimental-log-of-the-crazy-lich/elcl-chapter-111";
+   public void addChapter(int chapterNumber) {
+      this.chapterNumber = chapterNumber;
+      addChapter();
    }
 
-   public Elements getChapter(int chapterNumber) throws IOException {
-      toParse = Jsoup.connect(BASE_URL + BASE_NOVEL_URL + chapterNumber).get();
-      return Network.toParse.select("p");
+   public void addChapter() {
+      startNewTask();
    }
 
-   public Elements getChapter() throws IOException {
-      toParse = Jsoup.connect(BASE_URL + novelUrl).get();
-      return Network.toParse.select("p");
+   public void getChapter(int chapterNumber) {
+      Log.d(TAG, "getChapter: " + chapterNumber);
+      this.chapterNumber = chapterNumber;
+      startSetTask();
    }
 
-   public Elements nextChapter() throws IOException {
-      novelUrl = toParse.select(NEXT_CHAPTER_CSS).attr("href");
-      return getChapter();
+   private void startNewTask() {
+      AddTask dt = new AddTask();
+      dt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, chapterNumber);
    }
 
-   public Elements prevChapter() throws IOException {
-      novelUrl = toParse.select(PREV_CHAPTER_CSS).attr("href");
-      return getChapter();
+   private void startSetTask() {
+      SetTask dt = new SetTask();
+      dt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, chapterNumber);
+   }
+
+   private class AddTask extends AsyncTask<Integer, Void, Elements> {
+      @Override
+      protected Elements doInBackground(Integer... integers) {
+         try {
+            toParse = Jsoup.connect(BASE_URL + BASE_NOVEL_URL + integers[0]).get();
+            return Network.toParse.select("p");
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
+         return null;
+      }
+
+      @Override
+      protected void onPostExecute(Elements chapterItems) {
+         Log.d(TAG, "onPostExecute: update");
+         callback.updateItems(chapterItems);
+      }
+   }
+
+   private class SetTask extends AsyncTask<Integer, Void, Elements> {
+      @Override
+      protected Elements doInBackground(Integer... integers) {
+         try {
+            toParse = Jsoup.connect(BASE_URL + BASE_NOVEL_URL + integers[0]).get();
+            return Network.toParse.select("p");
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
+         return null;
+      }
+
+      @Override
+      protected void onPostExecute(Elements chapterItems) {
+         Log.d(TAG, "onPostExecute: set");
+         callback.setItems(chapterItems);
+      }
    }
 }

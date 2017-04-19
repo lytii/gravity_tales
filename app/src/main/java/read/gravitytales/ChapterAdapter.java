@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import butterknife.BindView;
@@ -47,5 +48,9 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHold
    @Override
    public int getItemCount() {
       return chapterItems.size();
+   }
+
+   public void addAll(Elements chapterItems) {
+      this.chapterItems.addAll(chapterItems);
    }
 }
