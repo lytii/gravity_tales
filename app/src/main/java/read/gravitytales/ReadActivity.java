@@ -17,6 +17,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static read.gravitytales.R.style.noTitleDialog;
+
 public class ReadActivity extends Activity {
 
    @BindView(R.id.chapter_recycler_view)
@@ -54,7 +56,7 @@ public class ReadActivity extends Activity {
    @OnClick(R.id.jump_button)
    public void jump() {
       final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-      AlertDialog.Builder alert = new AlertDialog.Builder(this);
+      AlertDialog.Builder alert = new AlertDialog.Builder(this, noTitleDialog);
       final EditText input = new EditText(this);
       input.setInputType(InputType.TYPE_CLASS_NUMBER);
       alert.setTitle("Enter Chapter Number");
@@ -70,7 +72,6 @@ public class ReadActivity extends Activity {
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
          }
       });
-
       alert.show();
       input.requestFocus();
       imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
