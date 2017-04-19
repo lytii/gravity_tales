@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <item type="id" name="chapter_buttons" />
+   <item type="id" name="add_buttons_layout" />
+   <item type="id" name="legends_layout" />
+   <item type="id" name="scene_legend" />
+
+   <item type="id" name="update_buttons_layout" />
+</resources>
