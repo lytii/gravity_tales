@@ -5,6 +5,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import static android.content.ContentValues.TAG;
@@ -57,12 +58,18 @@ public class ReadPresenter {
 
    // set items to new adapter, refreshes view
    public void setItems(Elements chapterItems) {
+      for(int i = 0; i < 16; i++) {
+         chapterItems.remove(chapterItems.size()-1);
+      }
       readActivity.setChapter(chapterItems);
       saveChapter();
    }
 
    // adds items to list, adds chapters to view
    public void updateItems(Elements chapterItems) {
+      for(int i = 0; i < 16; i++) {
+         chapterItems.remove(chapterItems.size()-1);
+      }
       chapterAdapter.addAll(chapterItems);
       chapterAdapter.notifyDataSetChanged();
       saveChapter();
