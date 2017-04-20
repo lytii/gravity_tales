@@ -5,8 +5,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
 
@@ -14,68 +15,79 @@ public class ReadPresenter {
 
    ReadActivity readActivity;
    ChapterAdapter chapterAdapter;
+   ObjectBox objectBox;
+   Boolean isLoading = false;
 
    Network network;
-   int chapterNumber = 112;
+   int currentChapter = 112;
 
    public ReadPresenter(ReadActivity readActivity) {
       this.readActivity = readActivity;
-      chapterAdapter = new ChapterAdapter(new Elements());
-      network = new Network(this);
+      chapterAdapter = new ChapterAdapter(new ArrayList<Paragraph>());
+      network = new Network();
+      network.setCallBack(this);
+      objectBox = new ObjectBox(readActivity);
    }
 
-   public void saveChapter() {
+   /**
+    * Save current chapter marker in shared prefs
+    */
+   public void markCurrentChapter() {
       SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(readActivity);
       sharedPreferences.edit()
-                       .putInt("Chapter", chapterNumber)
+                       .putInt("currentChapter", currentChapter)
                        .apply();
-      Toast.makeText(readActivity, "Chapter " + chapterNumber, Toast.LENGTH_SHORT);
+      Toast.makeText(readActivity, "currentChapter " + currentChapter, Toast.LENGTH_SHORT);
    }
 
-   public void loadChapter() {
+
+   /**
+    * Load current chapter marker from shared prefs
+    */
+   public void getCurrentChapterMarker() {
       SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(readActivity);
-      chapterNumber = sharedPreferences.getInt("Chapter", 111);
+      currentChapter = sharedPreferences.getInt("currentChapter", 111);
    }
 
+   /**
+    * Get chapter from local database
+    * or do network request and save chapter in database
+    * callback this to then get/set chapter
+    */
    public void getChapter() {
-      network.addChapter(chapterNumber);
+      Log.d(TAG, "getChapter: getting" + currentChapter);
+      Chapter chapter = objectBox.queryChapter(currentChapter);
+      if (chapter == null) {
+         Log.d(TAG, "getChapter: adding " + currentChapter);
+         isLoading = true;
+         network.addChapter(currentChapter);
+      } else {
+         isLoading = false;
+         readActivity.setChapter(chapter);
+         markCurrentChapter();
+      }
    }
 
-   public void getChapter(int chapterNumber) {
-      this.chapterNumber = chapterNumber;
-      network.addChapter(chapterNumber);
+   public void jumpToChapter(int chapterNumber) {
+      this.currentChapter = chapterNumber;
+      getChapter();
    }
 
    public void nextChapter() {
-      Log.d(TAG, "nextChapter: ");
-      network.getChapter(++chapterNumber);
+      ++currentChapter;
+      getChapter();
    }
 
    public void prevChapter() {
-      Log.d(TAG, "prevChapter: ");
-      network.getChapter(--chapterNumber);
+      --currentChapter;
+      getChapter();
    }
 
-   // set items to new adapter, refreshes view
-   public void setItems(Elements chapterItems) {
-      for(int i = 0; i < 16; i++) {
-         chapterItems.remove(chapterItems.size()-1);
-      }
-      readActivity.setChapter(chapterItems);
-      saveChapter();
+   public void putChapter(Elements chapterItems) {
+      objectBox.putChapter(chapterItems, currentChapter);
    }
 
-   // adds items to list, adds chapters to view
-   public void updateItems(Elements chapterItems) {
-      for(int i = 0; i < 16; i++) {
-         chapterItems.remove(chapterItems.size()-1);
-      }
-      chapterAdapter.addAll(chapterItems);
-      chapterAdapter.notifyDataSetChanged();
-      saveChapter();
-   }
-
-   public ChapterAdapter getChapterAdapter(){
-      return chapterAdapter;
+   public boolean getIsLoading() {
+      return isLoading;
    }
 }

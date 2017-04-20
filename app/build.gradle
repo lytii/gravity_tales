@@ -1,6 +1,13 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.objectbox'
 
+repositories {
+    jcenter()
+    maven {
+        url "http://objectbox.net/beta-repo/"
+    }
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -18,6 +25,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
 }
 
 dependencies {
@@ -36,4 +44,7 @@ dependencies {
     // butterknife annotations
     compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+
+    // object box database
+    compile 'io.objectbox:objectbox-android:0.9.9'
 }

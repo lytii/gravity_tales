@@ -18,28 +18,13 @@ public class Network {
    private static Document toParse;
    ReadPresenter callback;
 
-   public Network(ReadPresenter callback) {
+   public void setCallBack(ReadPresenter callback) {
       this.callback = callback;
    }
 
    public void addChapter(int chapterNumber) {
       this.chapterNumber = chapterNumber;
-      addChapter();
-   }
-
-   public void addChapter() {
-      startNewTask();
-   }
-
-   public void getChapter(int chapterNumber) {
-      Log.d(TAG, "getChapter: " + chapterNumber);
-      this.chapterNumber = chapterNumber;
       startSetTask();
-   }
-
-   private void startNewTask() {
-      AddTask dt = new AddTask();
-      dt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, chapterNumber);
    }
 
    private void startSetTask() {
@@ -47,31 +32,11 @@ public class Network {
       dt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, chapterNumber);
    }
 
-   private class AddTask extends AsyncTask<Integer, Void, Elements> {
-      @Override
-      protected Elements doInBackground(Integer... integers) {
-         try {
-            toParse = Jsoup.connect(BASE_URL + BASE_NOVEL_URL + integers[0]).get();
-            return Network.toParse.select("p");
-         } catch (IOException e) {
-            e.printStackTrace();
-         }
-         return null;
-      }
-
-      @Override
-      protected void onPostExecute(Elements chapterItems) {
-         Log.d(TAG, "onPostExecute: update");
-         callback.updateItems(chapterItems);
-      }
-   }
-
    private class SetTask extends AsyncTask<Integer, Void, Elements> {
       @Override
       protected Elements doInBackground(Integer... integers) {
          try {
-            toParse = Jsoup.connect(BASE_URL + BASE_NOVEL_URL + integers[0]).get();
-            return Network.toParse.select("p");
+            return connect(integers);
          } catch (IOException e) {
             e.printStackTrace();
          }
@@ -80,8 +45,14 @@ public class Network {
 
       @Override
       protected void onPostExecute(Elements chapterItems) {
-         Log.d(TAG, "onPostExecute: set");
-         callback.setItems(chapterItems);
+         Log.d(TAG, "onPostExecute: ");
+         callback.putChapter(chapterItems);
+         callback.getChapter();
       }
+   }
+
+   public Elements connect(Integer[] integers) throws IOException {
+      toParse = Jsoup.connect(BASE_URL + BASE_NOVEL_URL + integers[0]).get();
+      return Network.toParse.select("p");
    }
 }

@@ -11,7 +11,7 @@ import android.text.InputType;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import org.jsoup.select.Elements;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,36 +30,42 @@ public class ReadActivity extends Activity {
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_read);
-      presenter = new ReadPresenter(this);
       ButterKnife.bind(this);
+      presenter = new ReadPresenter(this);
+
       LinearLayoutManager LayoutManager = new LinearLayoutManager(this);
       chapterRecyclerView.setLayoutManager(LayoutManager);
-      chapterRecyclerView.setAdapter(presenter.getChapterAdapter());
-      presenter.loadChapter();
+      chapterRecyclerView.setAdapter(new ChapterAdapter(new ArrayList<Paragraph>()));
+
+      presenter.getCurrentChapterMarker();
       presenter.getChapter();
    }
 
    @OnClick(R.id.next_button)
    public void next() {
-      presenter.nextChapter();
+      if (!presenter.getIsLoading())
+         presenter.nextChapter();
    }
 
    @OnClick(R.id.prev_button)
    public void prev() {
-      presenter.prevChapter();
+      if (!presenter.getIsLoading())
+         presenter.prevChapter();
    }
 
    @OnClick(R.id.jump_button)
    public void jump() {
       final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
       AlertDialog.Builder alert = new AlertDialog.Builder(this, noTitleDialog);
+
       final EditText input = new EditText(this);
       input.setInputType(InputType.TYPE_CLASS_NUMBER);
       alert.setTitle("Enter Chapter Number");
       alert.setView(input);
       alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
          public void onClick(DialogInterface dialog, int whichButton) {
-            presenter.getChapter(Integer.parseInt(input.getText().toString()));
+            int chapter = Integer.parseInt(input.getText().toString());
+            presenter.jumpToChapter(chapter);
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
          }
       });
@@ -69,11 +75,12 @@ public class ReadActivity extends Activity {
          }
       });
       alert.show();
+
       input.requestFocus();
       imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
    }
 
-   public void setChapter(Elements chapterItems) {
-      chapterRecyclerView.setAdapter(new ChapterAdapter(chapterItems));
+   public void setChapter(Chapter chapter) {
+      chapterRecyclerView.setAdapter(new ChapterAdapter(chapter.getParagraphs()));
    }
 }

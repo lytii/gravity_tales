@@ -7,15 +7,16 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHolder> {
 
-   private Elements chapterItems;
+   private List<Paragraph> paragraphList;
 
    public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -28,8 +29,8 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHold
       }
    }
 
-   public ChapterAdapter(Elements chapterItems) {
-      this.chapterItems = chapterItems;
+   public ChapterAdapter(List<Paragraph> paragraphList) {
+      this.paragraphList = paragraphList;
    }
 
    @Override
@@ -41,16 +42,20 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHold
 
    @Override
    public void onBindViewHolder(ViewHolder holder, int position) {
-      String textItem = chapterItems.get(position).text();
+      String textItem = paragraphList.get(position).getParagraphText();
       holder.textView.setText(textItem);
    }
 
    @Override
    public int getItemCount() {
-      return chapterItems.size();
+      return paragraphList.size();
    }
 
-   public void addAll(Elements chapterItems) {
-      this.chapterItems.addAll(chapterItems);
+   public void addAll(List<Paragraph> paragraphList) {
+      this.paragraphList.addAll(paragraphList);
+   }
+
+   public List<Paragraph> getItems() {
+      return paragraphList;
    }
 }
