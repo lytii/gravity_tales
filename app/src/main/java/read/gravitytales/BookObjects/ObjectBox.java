@@ -1,4 +1,4 @@
-package read.gravitytales;
+package read.gravitytales.BookObjects;
 
 import android.app.Activity;
 
@@ -18,19 +18,33 @@ public class ObjectBox {
 
    public ObjectBox(Activity activity) {
       boxStore = MyObjectBox.builder().androidContext(activity).build();
+      Box<Book> bookBox = boxStore.boxFor(Book.class);
+
+      Book book = new Book();
+      book.setId(0);
+      book.setTitle("Evil Lich");
+      book.setCurrentChapter(111);
+      bookBox.put(book);
    }
 
    /**
     * Adds new chapter to chapter box/paragraph box
     */
    public void putChapter(Elements chapterItems, int chapterNumber) {
+      // XXX Remove hardcode
+      Box<Book> bookBox = boxStore.boxFor(Book.class);
+      Book book = bookBox.query().equal(Book_.id, 1).build().find().get(0);
+
+      List<Chapter> bookChapters = book.getChapters();
+
       // Make new chapter
       Chapter chapter = new Chapter();
       chapter.setChapterNumber(chapterNumber);
       boxStore.boxFor(Chapter.class).put(chapter);
+      bookChapters.add(chapter);
 
       // Make new paragraph list
-      List<Paragraph> paragraphs = chapter.getParagraphs();
+      List<Paragraph> chapterParagraphs = chapter.getParagraphs();
       Box<Paragraph> paragraphBox = boxStore.boxFor(Paragraph.class);
 
       for (int i = 0; i < 2; i++) {
@@ -48,8 +62,9 @@ public class ObjectBox {
          newParagraph.setChapterId(chapter.getChapterId());
 
          paragraphBox.put(newParagraph);
-         paragraphs.add(newParagraph);
+         chapterParagraphs.add(newParagraph);
       }
+
    }
 
    /**
@@ -59,6 +74,7 @@ public class ObjectBox {
    public Chapter queryChapter(int chapterNumber) {
       Box<Chapter> chapterBox = boxStore.boxFor(Chapter.class);
       List<Chapter> chapterList = chapterBox.query()
+                                            .equal(Chapter_.bookId, 0) // XXX Remove hardcode
                                             .equal(Chapter_.chapterNumber, chapterNumber)
                                             .build()
                                             .find();

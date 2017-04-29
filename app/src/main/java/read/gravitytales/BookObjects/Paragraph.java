@@ -1,15 +1,15 @@
-package read.gravitytales;
+package read.gravitytales.BookObjects;
 
+import io.objectbox.BoxStore;
 import io.objectbox.annotation.Entity;
+import io.objectbox.annotation.Generated;
 import io.objectbox.annotation.Id;
 import io.objectbox.annotation.Relation;
-import io.objectbox.annotation.Generated;
-import io.objectbox.Box;
-import io.objectbox.BoxStore;
 import io.objectbox.annotation.apihint.Internal;
 import io.objectbox.exception.DbDetachedException;
-import io.objectbox.exception.DbException;
 import io.objectbox.relation.ToOne;
+import io.objectbox.Box;
+import io.objectbox.exception.DbException;
 
 @Entity
 public class Paragraph {

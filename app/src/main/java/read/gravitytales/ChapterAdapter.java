@@ -7,12 +7,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.jsoup.select.Elements;
-
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import read.gravitytales.BookObjects.Paragraph;
 
 public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHolder> {
 
