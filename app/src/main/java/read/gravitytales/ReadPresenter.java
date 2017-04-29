@@ -9,10 +9,6 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 
-import read.gravitytales.BookObjects.Chapter;
-import read.gravitytales.BookObjects.ObjectBox;
-import read.gravitytales.BookObjects.Paragraph;
-
 import static android.content.ContentValues.TAG;
 
 public class ReadPresenter {
@@ -59,8 +55,10 @@ public class ReadPresenter {
     * callback this to then get/set chapter
     */
    public void getChapter() {
+      Log.d(TAG, "getChapter: getting" + currentChapter);
       Chapter chapter = objectBox.queryChapter(currentChapter);
       if (chapter == null) {
+         Log.d(TAG, "getChapter: adding " + currentChapter);
          isLoading = true;
          network.addChapter(currentChapter);
       } else {

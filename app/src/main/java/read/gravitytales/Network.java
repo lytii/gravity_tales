@@ -45,6 +45,7 @@ public class Network {
 
       @Override
       protected void onPostExecute(Elements chapterItems) {
+         Log.d(TAG, "onPostExecute: ");
          callback.putChapter(chapterItems);
          callback.getChapter();
       }

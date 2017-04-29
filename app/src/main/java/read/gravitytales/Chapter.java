@@ -1,18 +1,20 @@
-package read.gravitytales.BookObjects;
+package read.gravitytales;
 
+import org.jsoup.select.Elements;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import io.objectbox.Box;
-import io.objectbox.BoxStore;
 import io.objectbox.annotation.Entity;
-import io.objectbox.annotation.Generated;
 import io.objectbox.annotation.Id;
 import io.objectbox.annotation.Index;
 import io.objectbox.annotation.Relation;
+import io.objectbox.annotation.Generated;
+import io.objectbox.Box;
+import io.objectbox.BoxStore;
 import io.objectbox.annotation.apihint.Internal;
 import io.objectbox.exception.DbDetachedException;
 import io.objectbox.exception.DbException;
-import io.objectbox.relation.ToOne;
 
 @Entity
 public class Chapter {
@@ -23,28 +25,18 @@ public class Chapter {
    @Index
    private int chapterNumber;
 
-   private long bookId;
-
    @Relation(idProperty = "chapterId")
    private List<Paragraph> paragraphs;
-
-   @Relation
-   private Book book;
 
    /** Used to resolve relations */
    @Internal
    @Generated(hash = 1307364262)
    transient BoxStore __boxStore;
 
-@Internal
-@Generated(hash = 274585948)
-private transient ToOne<Chapter, Book> book__toOne;
-
-   @Generated(hash = 260141279)
-   public Chapter(long chapterId, int chapterNumber, long bookId) {
+   @Generated(hash = 1835204239)
+   public Chapter(long chapterId, int chapterNumber) {
        this.chapterId = chapterId;
        this.chapterNumber = chapterNumber;
-       this.bookId = bookId;
    }
 
    @Generated(hash = 393170288)
@@ -65,14 +57,6 @@ private transient ToOne<Chapter, Book> book__toOne;
 
    public void setChapterNumber(int chapterNumber) {
        this.chapterNumber = chapterNumber;
-   }
-
-   public long getBookId() {
-       return bookId;
-   }
-
-   public void setBookId(long bookId) {
-       this.bookId = bookId;
    }
 
    /**
@@ -127,29 +111,5 @@ private transient ToOne<Chapter, Book> book__toOne;
        }
        __boxStore.boxFor(Chapter.class).put(this);
    }
-
-/** See {@link io.objectbox.relation.ToOne} for details. */
-@Generated(hash = 1047404409)
-public synchronized ToOne<Chapter, Book> getBook__toOne() {
-    if (book__toOne == null) {
-        book__toOne = new ToOne<>(this, Chapter_.bookId, Book.class);
-    }
-    return book__toOne;
-}
-
-/** To-one relationship, resolved on first access. */
-@Generated(hash = 1325058034)
-public Book getBook() {
-    book = getBook__toOne().getTarget(this.bookId);
-    return book;
-}
-
-/** Set the to-one relation including its ID property. */
-@Generated(hash = 126347696)
-public void setBook(Book book) {
-    getBook__toOne().setTarget(book);
-    this.book = book;
-}
-
 }
 

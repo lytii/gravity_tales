@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import read.gravitytales.BookObjects.Chapter;
-import read.gravitytales.BookObjects.Paragraph;
 
 import static read.gravitytales.R.style.noTitleDialog;
 
