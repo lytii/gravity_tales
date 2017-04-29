@@ -7,12 +7,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.jsoup.select.Elements;
-
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import read.gravitytales.objects.Paragraph;
 
 public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHolder> {
 
@@ -49,13 +48,5 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHold
    @Override
    public int getItemCount() {
       return paragraphList.size();
-   }
-
-   public void addAll(List<Paragraph> paragraphList) {
-      this.paragraphList.addAll(paragraphList);
-   }
-
-   public List<Paragraph> getItems() {
-      return paragraphList;
    }
 }

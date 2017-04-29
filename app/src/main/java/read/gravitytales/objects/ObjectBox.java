@@ -1,4 +1,4 @@
-package read.gravitytales;
+package read.gravitytales.objects;
 
 import android.app.Activity;
 
@@ -9,6 +9,10 @@ import java.util.List;
 
 import io.objectbox.Box;
 import io.objectbox.BoxStore;
+import read.gravitytales.objects.Chapter;
+import read.gravitytales.objects.Chapter_;
+import read.gravitytales.objects.MyObjectBox;
+import read.gravitytales.objects.Paragraph;
 
 /**
  * wrapper class to use objectbox

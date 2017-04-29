@@ -1,4 +1,4 @@
-package read.gravitytales;
+package read.gravitytales.objects;
 
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
