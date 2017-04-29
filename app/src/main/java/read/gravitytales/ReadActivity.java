@@ -11,11 +11,10 @@ import android.text.InputType;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import java.util.ArrayList;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import read.gravitytales.objects.Chapter;
 
 import static read.gravitytales.R.style.noTitleDialog;
 
@@ -30,27 +29,25 @@ public class ReadActivity extends Activity {
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_read);
+
       ButterKnife.bind(this);
-      presenter = new ReadPresenter(this);
 
       LinearLayoutManager LayoutManager = new LinearLayoutManager(this);
       chapterRecyclerView.setLayoutManager(LayoutManager);
-      chapterRecyclerView.setAdapter(new ChapterAdapter(new ArrayList<Paragraph>()));
+//      chapterRecyclerView.addOnScrollListener(new LastItemDetector());
 
-      presenter.getCurrentChapterMarker();
-      presenter.getChapter();
+      presenter = new ReadPresenter(this);
+
    }
 
    @OnClick(R.id.next_button)
    public void next() {
-      if (!presenter.getIsLoading())
-         presenter.nextChapter();
+         presenter.showNextChapter();
    }
 
    @OnClick(R.id.prev_button)
    public void prev() {
-      if (!presenter.getIsLoading())
-         presenter.prevChapter();
+         presenter.showPrevChapter();
    }
 
    @OnClick(R.id.jump_button)
@@ -80,7 +77,26 @@ public class ReadActivity extends Activity {
       imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
    }
 
-   public void setChapter(Chapter chapter) {
+   public void displayChapter(Chapter chapter) {
       chapterRecyclerView.setAdapter(new ChapterAdapter(chapter.getParagraphs()));
+   }
+
+   public void displayChapter(ChapterAdapter chapterAdapter) {
+      chapterRecyclerView.setAdapter(chapterAdapter);
+   }
+
+   public class LastItemDetector extends RecyclerView.OnScrollListener   {
+
+      public void onScrollStateChanged(RecyclerView recyclerView, int newState){
+         if(isAtBottom(recyclerView)) {
+            presenter.preLoadNextChapter();
+         }
+      }
+
+      public boolean isAtBottom(RecyclerView recyclerView) {
+         int lastItem = ((LinearLayoutManager)recyclerView.getLayoutManager()).findLastVisibleItemPosition();
+         return lastItem > recyclerView.getChildCount();
+      }
+
    }
 }

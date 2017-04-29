@@ -1,4 +1,4 @@
-package read.gravitytales;
+package read.gravitytales.util;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -9,30 +9,26 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
+import read.gravitytales.BookManager;
+
 import static android.content.ContentValues.TAG;
 
 public class Network {
    private static String BASE_NOVEL_URL = "/novel/the-experimental-log-of-the-crazy-lich/elcl-chapter-";
    private static String BASE_URL = "http://gravitytales.com";
-   private int chapterNumber;
-   private static Document toParse;
-   ReadPresenter callback;
+   private BookManager callback;
 
-   public void setCallBack(ReadPresenter callback) {
+   public Network(BookManager callback) {
       this.callback = callback;
    }
 
-   public void addChapter(int chapterNumber) {
-      this.chapterNumber = chapterNumber;
-      startSetTask();
-   }
-
-   private void startSetTask() {
-      SetTask dt = new SetTask();
+   public void loadChapterFromNetwork(int chapterNumber) {
+      Log.d(TAG, "loadChapterFromNetwork: ");
+      LoadChapterTask dt = new LoadChapterTask();
       dt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, chapterNumber);
    }
 
-   private class SetTask extends AsyncTask<Integer, Void, Elements> {
+   private class LoadChapterTask extends AsyncTask<Integer, Void, Elements> {
       @Override
       protected Elements doInBackground(Integer... integers) {
          try {
@@ -45,14 +41,12 @@ public class Network {
 
       @Override
       protected void onPostExecute(Elements chapterItems) {
-         Log.d(TAG, "onPostExecute: ");
-         callback.putChapter(chapterItems);
-         callback.getChapter();
+         callback.loadChapter(chapterItems);
       }
    }
 
-   private Elements connect(Integer[] integers) throws IOException {
-      toParse = Jsoup.connect(BASE_URL + BASE_NOVEL_URL + integers[0]).get();
-      return Network.toParse.select("p");
+   public Elements connect(Integer[] integers) throws IOException {
+      Document toParse = Jsoup.connect(BASE_URL + BASE_NOVEL_URL + integers[0]).get();
+      return toParse.select("p");
    }
 }

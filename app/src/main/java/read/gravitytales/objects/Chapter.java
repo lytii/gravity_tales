@@ -1,8 +1,5 @@
-package read.gravitytales;
+package read.gravitytales.objects;
 
-import org.jsoup.select.Elements;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import io.objectbox.annotation.Entity;

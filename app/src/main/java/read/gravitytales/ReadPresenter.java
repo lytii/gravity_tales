@@ -1,93 +1,43 @@
 package read.gravitytales;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.widget.Toast;
-
-import org.jsoup.select.Elements;
-
-import java.util.ArrayList;
-
-import static android.content.ContentValues.TAG;
+import read.gravitytales.objects.Chapter;
 
 public class ReadPresenter {
 
    ReadActivity readActivity;
-   ChapterAdapter chapterAdapter;
-   ObjectBox objectBox;
-   Boolean isLoading = false;
-
-   Network network;
-   int currentChapter = 112;
+   BookManager bookManager;
 
    public ReadPresenter(ReadActivity readActivity) {
       this.readActivity = readActivity;
-      chapterAdapter = new ChapterAdapter(new ArrayList<Paragraph>());
-      network = new Network();
-      network.setCallBack(this);
-      objectBox = new ObjectBox(readActivity);
+      bookManager = new BookManager(this);
+      bookManager.getCurrentChapter();
+   }
+
+   public void displayChapter(Chapter chapter) {
+      readActivity.displayChapter(new ChapterAdapter(chapter.getParagraphs()));
    }
 
    /**
-    * Save current chapter marker in shared prefs
+    * Used when clicking next button
+    * to show next chapter
     */
-   public void markCurrentChapter() {
-      SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(readActivity);
-      sharedPreferences.edit()
-                       .putInt("currentChapter", currentChapter)
-                       .apply();
-      Toast.makeText(readActivity, "currentChapter " + currentChapter, Toast.LENGTH_SHORT);
-   }
-
-
-   /**
-    * Load current chapter marker from shared prefs
-    */
-   public void getCurrentChapterMarker() {
-      SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(readActivity);
-      currentChapter = sharedPreferences.getInt("currentChapter", 111);
+   public void showNextChapter() {
+      bookManager.showNextChapter();
    }
 
    /**
-    * Get chapter from local database
-    * or do network request and save chapter in database
-    * callback this to then get/set chapter
+    * Used when clicking prev button
+    * to show prev chapter
     */
-   public void getChapter() {
-      Log.d(TAG, "getChapter: getting" + currentChapter);
-      Chapter chapter = objectBox.queryChapter(currentChapter);
-      if (chapter == null) {
-         Log.d(TAG, "getChapter: adding " + currentChapter);
-         isLoading = true;
-         network.addChapter(currentChapter);
-      } else {
-         isLoading = false;
-         readActivity.setChapter(chapter);
-         markCurrentChapter();
-      }
+   public void showPrevChapter() {
+      bookManager.showPrevChapter();
    }
 
-   public void jumpToChapter(int chapterNumber) {
-      this.currentChapter = chapterNumber;
-      getChapter();
+   public void preLoadNextChapter() {
+      bookManager.preLoadNextChapter();
    }
 
-   public void nextChapter() {
-      ++currentChapter;
-      getChapter();
-   }
+   public void jumpToChapter(int chapter) {
 
-   public void prevChapter() {
-      --currentChapter;
-      getChapter();
-   }
-
-   public void putChapter(Elements chapterItems) {
-      objectBox.putChapter(chapterItems, currentChapter);
-   }
-
-   public boolean getIsLoading() {
-      return isLoading;
    }
 }
