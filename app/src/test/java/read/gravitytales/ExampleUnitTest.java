@@ -24,40 +24,5 @@ public class ExampleUnitTest {
    BoxStore boxStore;
    int chapterNumber = 111;
 
-   @Test
-   public void getChapter111Number() throws IOException {
-      Network network = new Network();
-      Elements paragraphs = network.connect(chapterNumber);
-      boxStore = MyObjectBox.builder().androidContext(this).build();
-      putChapter(paragraphs);
-      queryChapter(chapterNumber);
-   }
 
-   public void putChapter(Elements chapterItems) {
-      // Make new chapter
-      Chapter chapter = new Chapter();
-      chapter.setChapterNumber(chapterNumber);
-      boxStore.boxFor(Chapter.class).put(chapter);
-
-      // Make new paragraph list
-      List<Paragraph> paragraphs = chapter.getParagraphs();
-      Box<Paragraph> paragraphBox = boxStore.boxFor(Paragraph.class);
-
-      for (Element item : chapterItems) {
-         Paragraph newParagraph = new Paragraph();
-         newParagraph.setParagraphText(item.text());
-         newParagraph.setChapterId(chapter.getChapterId());
-
-         paragraphBox.put(newParagraph);
-         paragraphs.add(newParagraph);
-      }
-   }
-
-   public void queryChapter(int chapterNumber) {
-
-      Box<Paragraph> paragraphBox = boxStore.boxFor(Paragraph.class);
-      Box<Chapter> chapterBox = boxStore.boxFor(Chapter.class);
-      List<Chapter> chapter = chapterBox.query().equal(Chapter_.chapterNumber, chapterNumber).build().find();
-      System.out.println("Chapter size " + chapter.size());
-   }
 }

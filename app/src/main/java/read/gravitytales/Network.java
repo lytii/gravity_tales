@@ -51,7 +51,7 @@ public class Network {
       }
    }
 
-   public Elements connect(Integer[] integers) throws IOException {
+   private Elements connect(Integer[] integers) throws IOException {
       toParse = Jsoup.connect(BASE_URL + BASE_NOVEL_URL + integers[0]).get();
       return Network.toParse.select("p");
    }
