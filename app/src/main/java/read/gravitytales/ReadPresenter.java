@@ -38,6 +38,6 @@ public class ReadPresenter {
    }
 
    public void jumpToChapter(int chapter) {
-
+      bookManager.jumpToChapter(chapter);
    }
 }

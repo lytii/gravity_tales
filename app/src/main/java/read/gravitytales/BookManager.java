@@ -52,8 +52,11 @@ public class BookManager {
    }
 
    public void getCurrentChapter() {
-      Log.d(TAG, "getCurrentChapter: showing");
       showChapter(currentChapter);
+   }
+
+   public void jumpToChapter(int chapter) {
+      showChapter(chapter);
    }
 
    public void loadChapter(Elements chapterItems) {
@@ -62,7 +65,6 @@ public class BookManager {
       if(willShow) {
          readPresenter.displayChapter((objectBox.queryChapter(loadChapterNumber)));
       }
-      Log.d(TAG, "loadChapter:");
    }
 
    public void showNextChapter() {
