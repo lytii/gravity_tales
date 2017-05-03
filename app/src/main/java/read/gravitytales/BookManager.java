@@ -56,6 +56,7 @@ public class BookManager {
    }
 
    public void jumpToChapter(int chapter) {
+      currentChapter = chapter;
       showChapter(chapter);
    }
 
