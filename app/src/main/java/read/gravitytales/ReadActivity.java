@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
@@ -15,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static android.content.ContentValues.TAG;
 import static read.gravitytales.R.style.noTitleDialog;
 
 public class ReadActivity extends Activity {
@@ -32,6 +34,7 @@ public class ReadActivity extends Activity {
 
       ButterKnife.bind(this);
 
+      Log.d(TAG, "onCreate: ");
       LinearLayoutManager LayoutManager = new LinearLayoutManager(this);
       chapterRecyclerView.setLayoutManager(LayoutManager);
       lastItemDetector = new LastItemDetector();
@@ -43,16 +46,19 @@ public class ReadActivity extends Activity {
 
    @OnClick(R.id.next_button)
    public void next() {
-         presenter.showNextChapter();
+      Log.d(TAG, "next: ");
+      presenter.showNextChapter();
    }
 
    @OnClick(R.id.prev_button)
    public void prev() {
-         presenter.showPrevChapter();
+      Log.d(TAG, "prev: ");
+      presenter.showPrevChapter();
    }
 
    @OnClick(R.id.jump_button)
    public void jump() {
+      Log.d(TAG, "jump: ");
       final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
       AlertDialog.Builder alert = new AlertDialog.Builder(this, noTitleDialog);
 
@@ -79,6 +85,7 @@ public class ReadActivity extends Activity {
    }
 
    public void displayChapter(ChapterAdapter chapterAdapter) {
+      Log.d(TAG, "displayChapter: ");
       chapterRecyclerView.removeOnScrollListener(lastItemDetector);
       chapterRecyclerView.setAdapter(chapterAdapter);
       chapterRecyclerView.addOnScrollListener(lastItemDetector);
