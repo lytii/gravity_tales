@@ -8,7 +8,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
-import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
@@ -24,6 +23,7 @@ public class ReadActivity extends Activity {
    @BindView(R.id.chapter_recycler_view)
    RecyclerView chapterRecyclerView;
    LastItemDetector lastItemDetector;
+   LinearLayoutManager chapterLayoutManager;
 
    ReadPresenter presenter;
 
@@ -34,31 +34,37 @@ public class ReadActivity extends Activity {
 
       ButterKnife.bind(this);
 
-      Log.d(TAG, "onCreate: ");
-      LinearLayoutManager LayoutManager = new LinearLayoutManager(this);
-      chapterRecyclerView.setLayoutManager(LayoutManager);
+      chapterLayoutManager= new LinearLayoutManager(this);
+      chapterRecyclerView.setLayoutManager(chapterLayoutManager);
       lastItemDetector = new LastItemDetector();
       chapterRecyclerView.addOnScrollListener(lastItemDetector);
-
       presenter = new ReadPresenter(this);
 
    }
 
+   @Override
+   protected void onStop() {
+      super.onStop();
+      int pos = chapterLayoutManager.findFirstVisibleItemPosition();
+      presenter.markScroll(pos);
+   }
+
+   public void setSroll(int scrollPosition) {
+      chapterLayoutManager.scrollToPosition(scrollPosition);
+   }
+
    @OnClick(R.id.next_button)
    public void next() {
-      Log.d(TAG, "next: ");
       presenter.showNextChapter();
    }
 
    @OnClick(R.id.prev_button)
    public void prev() {
-      Log.d(TAG, "prev: ");
       presenter.showPrevChapter();
    }
 
    @OnClick(R.id.jump_button)
    public void jump() {
-      Log.d(TAG, "jump: ");
       final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
       AlertDialog.Builder alert = new AlertDialog.Builder(this, noTitleDialog);
 
@@ -85,7 +91,6 @@ public class ReadActivity extends Activity {
    }
 
    public void displayChapter(ChapterAdapter chapterAdapter) {
-      Log.d(TAG, "displayChapter: ");
       chapterRecyclerView.removeOnScrollListener(lastItemDetector);
       chapterRecyclerView.setAdapter(chapterAdapter);
       chapterRecyclerView.addOnScrollListener(lastItemDetector);
