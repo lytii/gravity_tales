@@ -14,7 +14,6 @@ import android.widget.EditText;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import read.gravitytales.objects.Chapter;
 
 import static read.gravitytales.R.style.noTitleDialog;
 
@@ -22,6 +21,7 @@ public class ReadActivity extends Activity {
 
    @BindView(R.id.chapter_recycler_view)
    RecyclerView chapterRecyclerView;
+   LastItemDetector lastItemDetector;
 
    ReadPresenter presenter;
 
@@ -34,7 +34,8 @@ public class ReadActivity extends Activity {
 
       LinearLayoutManager LayoutManager = new LinearLayoutManager(this);
       chapterRecyclerView.setLayoutManager(LayoutManager);
-//      chapterRecyclerView.addOnScrollListener(new LastItemDetector());
+      lastItemDetector = new LastItemDetector();
+      chapterRecyclerView.addOnScrollListener(lastItemDetector);
 
       presenter = new ReadPresenter(this);
 
@@ -77,12 +78,10 @@ public class ReadActivity extends Activity {
       imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
    }
 
-   public void displayChapter(Chapter chapter) {
-      chapterRecyclerView.setAdapter(new ChapterAdapter(chapter.getParagraphs()));
-   }
-
    public void displayChapter(ChapterAdapter chapterAdapter) {
+      chapterRecyclerView.removeOnScrollListener(lastItemDetector);
       chapterRecyclerView.setAdapter(chapterAdapter);
+      chapterRecyclerView.addOnScrollListener(lastItemDetector);
    }
 
    public class LastItemDetector extends RecyclerView.OnScrollListener   {
@@ -90,12 +89,12 @@ public class ReadActivity extends Activity {
       public void onScrollStateChanged(RecyclerView recyclerView, int newState){
          if(isAtBottom(recyclerView)) {
             presenter.preLoadNextChapter();
+            chapterRecyclerView.removeOnScrollListener(lastItemDetector);
          }
       }
 
-      public boolean isAtBottom(RecyclerView recyclerView) {
-         int lastItem = ((LinearLayoutManager)recyclerView.getLayoutManager()).findLastVisibleItemPosition();
-         return lastItem > recyclerView.getChildCount();
+      private boolean isAtBottom(RecyclerView recyclerView) {
+         return !recyclerView.canScrollVertically(0);
       }
 
    }

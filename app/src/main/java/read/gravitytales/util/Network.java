@@ -23,7 +23,7 @@ public class Network {
    }
 
    public void loadChapterFromNetwork(int chapterNumber) {
-      Log.d(TAG, "loadChapterFromNetwork: ");
+      Log.d(TAG, "loadChapterFromNetwork: " +chapterNumber);
       LoadChapterTask dt = new LoadChapterTask();
       dt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, chapterNumber);
    }

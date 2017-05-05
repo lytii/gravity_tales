@@ -1,14 +1,10 @@
 package read.gravitytales;
 
-import android.util.Log;
-
 import org.jsoup.select.Elements;
 
 import read.gravitytales.objects.Chapter;
-import read.gravitytales.util.Network;
 import read.gravitytales.objects.ObjectBox;
-
-import static android.content.ContentValues.TAG;
+import read.gravitytales.util.Network;
 
 /**
  * Handles setting/getting from cache
@@ -36,19 +32,18 @@ public class BookManager {
    }
 
    private void fromCacheOrNetwork(int number) {
-      Log.d(TAG, "fromCacheOrNetwork: starting" + number);
       Chapter chapter = objectBox.queryChapter(number);
-      if(chapter == null) {
+      if (chapter == null) {
          loading = true;
          loadChapterNumber = number;
          network.loadChapterFromNetwork(number);
       } else {
-         readPresenter.displayChapter(chapter);
+         displayChapter(chapter);
       }
    }
 
    public void preLoadNextChapter() {
-      fromCacheOrNetwork(currentChapter+1);
+      fromCacheOrNetwork(currentChapter + 1);
    }
 
    public void getCurrentChapter() {
@@ -63,19 +58,24 @@ public class BookManager {
    public void loadChapter(Elements chapterItems) {
       loading = false;
       objectBox.putChapter(chapterItems, loadChapterNumber);
-      if(willShow) {
-         readPresenter.displayChapter((objectBox.queryChapter(loadChapterNumber)));
+      if (willShow) {
+         displayChapter(objectBox.queryChapter(loadChapterNumber));
+         willShow = false;
       }
    }
 
+   private void displayChapter(Chapter chapter) {
+      readPresenter.displayChapter(chapter);
+   }
+
    public void showNextChapter() {
-      if(!loading) {
+      if (!loading) {
          showChapter(++currentChapter);
       }
    }
 
    public void showPrevChapter() {
-      if(!loading) {
+      if (!loading) {
          showChapter(--currentChapter);
       }
    }
