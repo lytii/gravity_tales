@@ -22,7 +22,7 @@ public class ReadPresenter {
       initializeStuff(); // using readActivity
 
       // Load last seen chapter
-      int currentChapter = sharedPreferences.getInt("Current Chapter", 140);
+      int currentChapter = sharedPreferences.getInt("Current Chapter", 144);
       bookManager.jumpToChapter(currentChapter);
       setScroll();
    }

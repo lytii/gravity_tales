@@ -1,9 +1,12 @@
 package read.gravitytales.util;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
@@ -13,8 +16,10 @@ import read.gravitytales.BookManager;
 import static android.content.ContentValues.TAG;
 
 public class Network {
-   private static String BASE_NOVEL_URL = "/novel/the-experimental-log-of-the-crazy-lich/elcl-chapter-";
-   private static String BASE_URL = "http://gravitytales.com";
+   //   private static String BASE_NOVEL_URL = "/novel/the-experimental-log-of-the-crazy-lich/elcl-chapter-";
+//   private static String BASE_URL = "http://gravitytales.com";
+   private static String BASE_NOVEL_URL = "/ssn-index/ssn-chapter-";
+   private static String BASE_URL = "http://www.wuxiaworld.com";
    private BookManager callback;
 
    public Network(BookManager callback) {
@@ -22,6 +27,7 @@ public class Network {
    }
 
    public void loadChapterFromNetwork(int chapterNumber) {
+      Log.d(TAG, "loadChapterFromNetwork: ");
       LoadChapterTask dt = new LoadChapterTask();
       dt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, chapterNumber);
    }
@@ -45,6 +51,38 @@ public class Network {
 
    public Elements connect(Integer[] integers) throws IOException {
       Document toParse = Jsoup.connect(BASE_URL + BASE_NOVEL_URL + integers[0]).get();
-      return toParse.select("p");
+      Elements selected = toParse.select("[dir]");
+      // When easy selector doesn't work
+      if (selected.size() == 0) {
+         System.out.println("NOT EASY");
+         selected = toParse.select("p");
+         selected.remove(0);
+         Elements title = selected.get(0).select("span");
+         for (Element a : title) {
+            // If Next/Previous Chapter is first chapter item, remove it
+            if (!a.text().contains("Next Chapter") && !a.text().contains("Previous Chapter")) {
+               selected.set(0, a);
+               System.out.println("NEXT CHAPTER IS THERE");
+            }
+         }
+         // Remove item single item
+         String prevNext = selected.get(0).text();
+         if (prevNext.contains("Next Chapter") | prevNext.contains("Previous Chapter")) {
+            System.out.println("\nremoving: " + selected.get(0));
+            selected.remove(0);
+         }
+         // Remove space after chapter title
+         if (selected.get(1).text().charAt(0) == 160) {
+            selected.remove(1);
+         }
+         String NEXT_PREV = "Previous Chapter Next Chapter";
+         while (!selected.get(selected.size() - 1).text().contains(NEXT_PREV)) {
+            selected.remove(selected.size() - 1);
+         }
+         int LAST_ITEM = selected.size() - 1;
+         if (selected.get(LAST_ITEM).text().contains(NEXT_PREV))
+            selected.set(LAST_ITEM, selected.get(LAST_ITEM).getElementsByIndexEquals(0).get(0));
+      }
+      return selected;
    }
 }

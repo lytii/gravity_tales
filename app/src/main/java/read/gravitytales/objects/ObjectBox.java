@@ -37,14 +37,6 @@ public class ObjectBox {
       List<Paragraph> paragraphs = chapter.getParagraphs();
       Box<Paragraph> paragraphBox = boxStore.boxFor(Paragraph.class);
 
-      for (int i = 0; i < 2; i++) {
-         chapterItems.remove(0);
-      }
-      // trim chapter items
-      for (int i = 0; i < 16; i++) {
-         chapterItems.remove(chapterItems.size() - 1);
-      }
-
       // add paragraphs to box
       for (Element item : chapterItems) {
          Paragraph newParagraph = new Paragraph();
