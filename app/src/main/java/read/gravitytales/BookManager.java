@@ -15,6 +15,9 @@ import static android.content.ContentValues.TAG;
  */
 public class BookManager {
 
+   //   private static String BASE_NOVEL_URL = "/novel/the-experimental-log-of-the-crazy-lich/elcl-chapter-";
+//   private static String BASE_URL = "http://gravitytales.com";
+   private static String bookUrl = "http://www.wuxiaworld.com/ssn-index/ssn-chapter-";
    private int currentChapter = 1;
    private int loadChapterNumber;
    private ReadPresenter readPresenter;
@@ -34,13 +37,17 @@ public class BookManager {
       fromCacheOrNetwork(number);
    }
 
+   public void changeBook(String bookUrl) {
+      this.bookUrl = bookUrl;
+   }
+
    private void fromCacheOrNetwork(int number) {
       loadChapterNumber = number;
       Chapter chapter = objectBox.queryChapter(number);
       if (chapter == null) {
          loading = true;
-         network.loadChapterFromNetwork(number);
-      } else {
+         network.loadChapterFromNetwork(bookUrl, number);
+      } else if(willShow){
          displayChapter(chapter);
       }
    }

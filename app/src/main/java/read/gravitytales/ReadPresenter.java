@@ -2,7 +2,9 @@ package read.gravitytales;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
+import butterknife.OnClick;
 import read.gravitytales.objects.Chapter;
 import read.gravitytales.objects.ObjectBox;
 
@@ -22,9 +24,13 @@ public class ReadPresenter {
       initializeStuff(); // using readActivity
 
       // Load last seen chapter
-      int currentChapter = sharedPreferences.getInt("Current Chapter", 144);
+      int currentChapter = sharedPreferences.getInt("Current Chapter", 124);
       bookManager.jumpToChapter(currentChapter);
       setScroll();
+   }
+
+   public void changeBook(String bookUrl) {
+      bookManager.changeBook(bookUrl);
    }
 
    /**
@@ -35,6 +41,7 @@ public class ReadPresenter {
    public void displayChapter(Chapter chapter) {
       chapterAdapter = new ChapterAdapter(chapter.getParagraphs());
       readActivity.displayChapter(chapterAdapter);
+      readActivity.setTitle(chapter.getParagraphs().get(0).getParagraphText());
    }
 
    /**

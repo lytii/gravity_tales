@@ -4,6 +4,7 @@
    <item type="id" name="add_buttons_layout" />
    <item type="id" name="legends_layout" />
    <item type="id" name="scene_legend" />
+   <item type="id" name="chapter_recycler_view" />
 
    <item type="id" name="update_buttons_layout" />
 </resources>
