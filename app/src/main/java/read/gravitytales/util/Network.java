@@ -17,10 +17,14 @@ import static android.content.ContentValues.TAG;
 
 public class Network {
    private BookManager callback;
-   private String bookUrl;
+   private String bookUrl = "http://www.wuxiaworld.com/emperorofsoloplay-index/esp-chapter-";
 
    public Network(BookManager callback) {
       this.callback = callback;
+   }
+
+   public Network() {
+
    }
 
    public void loadChapterFromNetwork(String bookUrl, int chapterNumber) {
