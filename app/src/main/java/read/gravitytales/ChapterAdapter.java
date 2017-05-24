@@ -1,6 +1,7 @@
 package read.gravitytales;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,9 +41,10 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHold
    }
 
    @Override
+   @SuppressWarnings("deprecation")
    public void onBindViewHolder(ViewHolder holder, int position) {
       String textItem = paragraphList.get(position).getParagraphText();
-      holder.textView.setText(textItem);
+      holder.textView.setText(Html.fromHtml(textItem));
    }
 
    @Override
