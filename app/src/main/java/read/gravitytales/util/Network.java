@@ -56,11 +56,21 @@ public class Network {
       List<Node> all = toParse.select("div#chapterContent").get(0).childNodes();
       ArrayList<String> d = new ArrayList<String>();
       int i = 0;
+      boolean first = false; // to remove multiple new lines in a row
       for (Node node : all) {
-         String string = node.toString();
-         string = string.replaceAll("<p[^>]+>|</p>|<p>", "");
-         if (!string.equals(" ") && !string.equals("<hr>") && !string.equals("<br>") && !string.equals("&nbsp;")) {
-            d.add(string);
+         String string = node.toString().replaceAll("<p[^>]+>|</p>|<p>", "");
+         if (!string.equals(" ")
+               && !string.equals("<hr>")
+               && !string.equals("<br>")
+               && !string.equals("&nbsp;")) {
+            if (string.length() == 0 && first) {
+               // second new line, don't add it
+               first = false;
+            } else {
+               // first new line usually has meaning
+               first = string.length() == 0;
+               d.add(string);
+            }
          }
       }
       return d;

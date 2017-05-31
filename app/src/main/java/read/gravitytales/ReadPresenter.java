@@ -39,9 +39,14 @@ public class ReadPresenter {
    public void displayChapter(Chapter chapter) {
       chapterAdapter = new ChapterAdapter(chapter.getParagraphs());
       readActivity.displayChapter(chapterAdapter);
-      readActivity.setTitle(
-            Html.fromHtml(chapter.getParagraphs().get(0).getParagraphText())
-      );
+      String title = chapter.getParagraphs().get(0).getParagraphText();
+
+      // if chapter number isn't in title, prepend it
+      if(!title.contains("" + bookManager.getCurrentChapter())) {
+         title = bookManager.getCurrentChapter() + title;
+      }
+
+      readActivity.setTitle(Html.fromHtml(title));
    }
 
    /**
