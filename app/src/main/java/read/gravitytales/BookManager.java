@@ -30,6 +30,10 @@ public class BookManager {
       network = new Network(this);
    }
 
+   public int getCurrentChapter() {
+      return currentChapter;
+   }
+
    private void showChapter(int number) {
       willShow = true;
       fromCacheOrNetwork(number);
