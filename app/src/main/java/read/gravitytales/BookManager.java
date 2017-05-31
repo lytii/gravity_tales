@@ -1,13 +1,11 @@
 package read.gravitytales;
 
 
-import org.jsoup.select.Elements;
+import java.util.ArrayList;
 
 import read.gravitytales.objects.Chapter;
 import read.gravitytales.objects.ObjectBox;
 import read.gravitytales.util.Network;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * Handles setting/getting from cache
@@ -17,7 +15,7 @@ public class BookManager {
 
    //   private static String BASE_NOVEL_URL = "/novel/the-experimental-log-of-the-crazy-lich/elcl-chapter-";
 //   private static String BASE_URL = "http://gravitytales.com";
-   private static String bookUrl = "http://www.wuxiaworld.com/ssn-index/ssn-chapter-";
+   private String bookUrl = "http://www.wuxiaworld.com/emperorofsoloplay-index/esp-chapter-";
    private int currentChapter = 1;
    private int loadChapterNumber;
    private ReadPresenter readPresenter;
@@ -61,7 +59,7 @@ public class BookManager {
       showChapter(chapter);
    }
 
-   public void loadChapter(Elements chapterItems) {
+   public void loadChapter(ArrayList<String> chapterItems) {
       loading = false;
       objectBox.putChapter(chapterItems, loadChapterNumber);
       if (willShow) {

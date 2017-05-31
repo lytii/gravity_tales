@@ -1,27 +1,31 @@
 package read.gravitytales;
 
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
-import read.gravitytales.util.DivNetwork;
+import read.gravitytales.util.Network;
 
 public class NetworkUnitTest {
 
    @Test
    public void testNetwork() throws IOException {
+//      download(63);
       download(53);
-      download(54);
-      download(55);
+      divdownload(53);
+//      download(54);
    }
 
    public void download(int number) throws IOException {
-      DivNetwork network = new DivNetwork();
+      Network network = new Network();
       Integer[] f = {number};
-      Elements a = network.connect(f);
-      Element b = a.get(14);
-      System.out.println(a.size());
+      ArrayList<String> a = network.connect(f);
+      ArrayList<String> b = a;
+   }
+
+   public void divdownload(int number) throws IOException {
+      Network network = new Network();
+      Integer[] f = {number};
    }
 }

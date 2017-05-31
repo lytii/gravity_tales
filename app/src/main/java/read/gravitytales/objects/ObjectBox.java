@@ -2,17 +2,11 @@ package read.gravitytales.objects;
 
 import android.app.Activity;
 
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import io.objectbox.Box;
 import io.objectbox.BoxStore;
-import read.gravitytales.objects.Chapter;
-import read.gravitytales.objects.Chapter_;
-import read.gravitytales.objects.MyObjectBox;
-import read.gravitytales.objects.Paragraph;
 
 /**
  * wrapper class to use objectbox
@@ -27,7 +21,7 @@ public class ObjectBox {
    /**
     * Adds new chapter to chapter box/paragraph box
     */
-   public void putChapter(Elements chapterItems, int chapterNumber) {
+   public void putChapter(ArrayList<String> chapterItems, int chapterNumber) {
       // Make new chapter
       Chapter chapter = new Chapter();
       chapter.setChapterNumber(chapterNumber);
@@ -38,9 +32,9 @@ public class ObjectBox {
       Box<Paragraph> paragraphBox = boxStore.boxFor(Paragraph.class);
 
       // add paragraphs to box
-      for (Element item : chapterItems) {
+      for (String item : chapterItems) {
          Paragraph newParagraph = new Paragraph();
-         newParagraph.setParagraphText(item.text());
+         newParagraph.setParagraphText(item);
          newParagraph.setChapterId(chapter.getChapterId());
 
          paragraphBox.put(newParagraph);
@@ -61,5 +55,10 @@ public class ObjectBox {
       if (chapterList.size() == 0)
          return null;
       return chapterList.get(0);
+   }
+
+   public void clear() {
+      Box<Chapter> chapterBox = boxStore.boxFor(Chapter.class);
+      chapterBox.removeAll();
    }
 }
