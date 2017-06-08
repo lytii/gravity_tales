@@ -21,7 +21,7 @@ public class ReadPresenter {
       initializeStuff(); // using readActivity
 
       // Load last seen chapter
-      int currentChapter = sharedPreferences.getInt("Current Chapter", 53);
+      int currentChapter = sharedPreferences.getInt("Current Chapter", 58);
       bookManager.jumpToChapter(currentChapter);
       setScroll();
    }
@@ -40,12 +40,13 @@ public class ReadPresenter {
       chapterAdapter = new ChapterAdapter(chapter.getParagraphs());
       readActivity.displayChapter(chapterAdapter);
       String title = chapter.getParagraphs().get(0).getParagraphText();
-
+      if(title.contains("Next Chapter") || title.contains("Previous Chapter")) {
+         title = chapter.getParagraphs().get(1).getParagraphText();
+      }
       // if chapter number isn't in title, prepend it
       if(!title.contains("" + bookManager.getCurrentChapter())) {
          title = bookManager.getCurrentChapter() + title;
       }
-
       readActivity.setTitle(Html.fromHtml(title));
    }
 

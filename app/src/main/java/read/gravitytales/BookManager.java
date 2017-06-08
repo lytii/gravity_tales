@@ -15,7 +15,7 @@ public class BookManager {
 
    //   private static String BASE_NOVEL_URL = "/novel/the-experimental-log-of-the-crazy-lich/elcl-chapter-";
 //   private static String BASE_URL = "http://gravitytales.com";
-   private String bookUrl = "http://www.wuxiaworld.com/emperorofsoloplay-index/esp-chapter-";
+   private String bookUrl = "https://gravitytales.com/Novel/dimensional-sovereign/ds-chapter-";
    private int currentChapter = 1;
    private int loadChapterNumber;
    private ReadPresenter readPresenter;

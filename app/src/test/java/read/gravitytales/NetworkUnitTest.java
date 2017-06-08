@@ -10,22 +10,14 @@ import read.gravitytales.util.Network;
 public class NetworkUnitTest {
 
    @Test
-   public void testNetwork() throws IOException {
-//      download(63);
-      download(53);
-      divdownload(53);
-//      download(54);
+   public void testNetwork() throws Exception {
+      download(45);
    }
 
-   public void download(int number) throws IOException {
-      Network network = new Network();
+   public void download(int number) throws Exception {
+      Network network = new Network("https://gravitytales.com/Novel/dimensional-sovereign/ds-chapter-");
       Integer[] f = {number};
       ArrayList<String> a = network.connect(f);
-      ArrayList<String> b = a;
-   }
-
-   public void divdownload(int number) throws IOException {
-      Network network = new Network();
-      Integer[] f = {number};
+      System.out.println(a);
    }
 }
