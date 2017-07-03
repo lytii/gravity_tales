@@ -1,0 +1,51 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:8268941781914978304",
+      "lastPropertyId": "2:7718686432535342180",
+      "name": "Chapter",
+      "properties": [
+        {
+          "id": "1:8592229619734926877",
+          "name": "chapterId"
+        },
+        {
+          "id": "2:7718686432535342180",
+          "indexId": "1:8569319939955406407",
+          "name": "chapterNumber"
+        }
+      ]
+    },
+    {
+      "id": "2:6847662645748190051",
+      "lastPropertyId": "3:4173649565464898936",
+      "name": "Paragraph",
+      "properties": [
+        {
+          "id": "1:2590736204097675668",
+          "name": "paragraphId"
+        },
+        {
+          "id": "2:4927076062521748736",
+          "indexId": "2:8307390135483341857",
+          "name": "chapterId"
+        },
+        {
+          "id": "3:4173649565464898936",
+          "name": "paragraphText"
+        }
+      ]
+    }
+  ],
+  "lastEntityId": "2:6847662645748190051",
+  "lastIndexId": "2:8307390135483341857",
+  "lastSequenceId": "0:0",
+  "modelVersion": 2,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "version": 1
+}

@@ -15,7 +15,7 @@ public class BookManager {
 
    //   private static String BASE_NOVEL_URL = "/novel/the-experimental-log-of-the-crazy-lich/elcl-chapter-";
 //   private static String BASE_URL = "http://gravitytales.com";
-   private String bookUrl = "https://gravitytales.com/Novel/dimensional-sovereign/ds-chapter-";
+   private String bookUrl = "https://www.wuxiaworld.com/ssn-index/ssn-chapter-";
    private int currentChapter = 1;
    private int loadChapterNumber;
    private ReadPresenter readPresenter;
@@ -49,7 +49,7 @@ public class BookManager {
       if (chapter == null) {
          loading = true;
          network.loadChapterFromNetwork(bookUrl, number);
-      } else if(willShow){
+      } else if (willShow) {
          displayChapter(chapter);
       }
    }

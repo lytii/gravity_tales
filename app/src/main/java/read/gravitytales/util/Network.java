@@ -5,11 +5,9 @@ import android.util.Log;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +17,7 @@ import static android.content.ContentValues.TAG;
 
 public class Network {
    private BookManager callback;
-   private String bookUrl = "https://gravitytales.com/Novel/dimensional-sovereign/ds-chapter-";
+   private String bookUrl = "https://www.wuxiaworld.com/ssn-index/ssn-chapter-";
 
    public Network(BookManager callback) {
       this.callback = callback;
@@ -60,7 +58,7 @@ public class Network {
    public ArrayList<String> connect(Integer[] integers) throws Exception {
       Document toParse = Jsoup.connect(bookUrl + integers[0]).get();
       Elements chapterContent = toParse.select("div#chapterContent");
-      if(chapterContent.size() == 0) // backup parsing
+      if (chapterContent.size() == 0) // backup parsing
          chapterContent = toParse.select("div [itemprop='articleBody']");
       List<Node> all = chapterContent.get(0).childNodes();
       ArrayList<String> paragraphs = new ArrayList<>();
@@ -82,10 +80,10 @@ public class Network {
             }
          }
       }
-      if(paragraphs.get(0).contains("Next Chapter") || paragraphs.get(0).contains("Previous Chapter")) {
+      if (paragraphs.get(0).contains("Next Chapter") || paragraphs.get(0).contains("Previous Chapter")) {
          String title = paragraphs.get(0);
          Elements spanSelect = Jsoup.parse(title).select("span");
-         if(spanSelect.size() == 2)
+         if (spanSelect.size() == 2)
             paragraphs.set(0, spanSelect.get(1).toString());
          else
             paragraphs.remove(0);

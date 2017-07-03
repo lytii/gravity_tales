@@ -1,8 +1,12 @@
 package read.gravitytales;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.text.Html;
+import android.widget.Toast;
 
 import read.gravitytales.objects.Chapter;
 import read.gravitytales.objects.ObjectBox;
@@ -40,11 +44,11 @@ public class ReadPresenter {
       chapterAdapter = new ChapterAdapter(chapter.getParagraphs());
       readActivity.displayChapter(chapterAdapter);
       String title = chapter.getParagraphs().get(0).getParagraphText();
-      if(title.contains("Next Chapter") || title.contains("Previous Chapter")) {
+      if (title.contains("Next Chapter") || title.contains("Previous Chapter")) {
          title = chapter.getParagraphs().get(1).getParagraphText();
       }
       // if chapter number isn't in title, prepend it
-      if(!title.contains("" + bookManager.getCurrentChapter())) {
+      if (!title.contains("" + bookManager.getCurrentChapter())) {
          title = bookManager.getCurrentChapter() + title;
       }
       readActivity.setTitle(Html.fromHtml(title));
@@ -82,7 +86,8 @@ public class ReadPresenter {
     * to show next chapter
     */
    public void showNextChapter() {
-      bookManager.showNextChapter();
+      if (hasNetwork())
+         bookManager.showNextChapter();
    }
 
    /**
@@ -90,15 +95,31 @@ public class ReadPresenter {
     * to show prev chapter
     */
    public void showPrevChapter() {
-      bookManager.showPrevChapter();
+      if (hasNetwork())
+         bookManager.showPrevChapter();
    }
 
    public void preLoadNextChapter() {
-      bookManager.preLoadNextChapter();
+      if (hasNetwork())
+         bookManager.preLoadNextChapter();
    }
 
    public void jumpToChapter(int chapter) {
-      bookManager.jumpToChapter(chapter);
+      if (hasNetwork())
+         bookManager.jumpToChapter(chapter);
+   }
+
+
+   public boolean hasNetwork() {
+      ConnectivityManager cm =
+            (ConnectivityManager) readActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+      NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+      boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+      if (!isConnected) {
+         Toast.makeText(readActivity, "No Network", Toast.LENGTH_SHORT).show();
+      }
+      return isConnected;
    }
 
    public ObjectBox getObjectBox() {
