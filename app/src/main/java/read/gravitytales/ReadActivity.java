@@ -11,8 +11,10 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -141,6 +143,16 @@ public class ReadActivity extends AppCompatActivity {
 
       input.requestFocus();
       imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+   }
+
+   public void showLoading() {
+      ProgressBar progressBar = (ProgressBar) findViewById(R.id.loading_bar);
+      progressBar.setVisibility(View.VISIBLE);
+   }
+
+   public void stopLoading() {
+      ProgressBar progressBar = (ProgressBar) findViewById(R.id.loading_bar);
+      progressBar.setVisibility(View.INVISIBLE);
    }
 
    /**

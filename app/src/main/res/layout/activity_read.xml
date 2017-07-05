@@ -7,7 +7,11 @@
                 tools:context="read.gravitytales.ReadActivity">
 
    <include layout="@layout/chapter_layout" android:id="@+id/chapter_view"/>
-
+   <ProgressBar
+      android:id="@+id/loading_bar"
+      android:visibility="invisible"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
    <TextView
       android:id="@+id/chapter_item_text_view"
       android:layout_width="match_parent"

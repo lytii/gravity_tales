@@ -52,6 +52,7 @@ public class ReadPresenter {
          title = bookManager.getCurrentChapter() + title;
       }
       readActivity.setTitle(Html.fromHtml(title));
+      readActivity.stopLoading();
    }
 
    /**
@@ -86,8 +87,10 @@ public class ReadPresenter {
     * to show next chapter
     */
    public void showNextChapter() {
-      if (hasNetwork())
+      if (hasNetwork()) {
+         readActivity.showLoading();
          bookManager.showNextChapter();
+      }
    }
 
    /**
@@ -95,18 +98,23 @@ public class ReadPresenter {
     * to show prev chapter
     */
    public void showPrevChapter() {
-      if (hasNetwork())
+      if (hasNetwork()) {
+         readActivity.showLoading();
          bookManager.showPrevChapter();
+      }
    }
 
    public void preLoadNextChapter() {
-      if (hasNetwork())
+      if (hasNetwork()) {
          bookManager.preLoadNextChapter();
+      }
    }
 
    public void jumpToChapter(int chapter) {
-      if (hasNetwork())
+      if (hasNetwork()) {
+         readActivity.showLoading();
          bookManager.jumpToChapter(chapter);
+      }
    }
 
 
