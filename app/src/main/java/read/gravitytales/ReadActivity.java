@@ -25,6 +25,7 @@ public class ReadActivity extends AppCompatActivity {
 
    @BindView(R.id.chapter_recycler_view)
    RecyclerView chapterRecyclerView;
+
    LastItemDetector lastItemDetector;
    LinearLayoutManager chapterLayoutManager;
 
@@ -42,6 +43,7 @@ public class ReadActivity extends AppCompatActivity {
 
       chapterLayoutManager = new LinearLayoutManager(this);
       chapterRecyclerView.setLayoutManager(chapterLayoutManager);
+
       lastItemDetector = new LastItemDetector();
       chapterRecyclerView.addOnScrollListener(lastItemDetector);
       presenter = new ReadPresenter(this);

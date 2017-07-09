@@ -1,11 +1,23 @@
 package read.gravitytales;
 
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.util.ArrayList;
 
+import io.objectbox.android.AndroidScheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import read.gravitytales.objects.Chapter;
 import read.gravitytales.objects.ObjectBox;
+import read.gravitytales.util.ChapterParser;
 import read.gravitytales.util.Network;
+import read.gravitytales.util.WuxiaService;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Handles setting/getting from cache
@@ -15,7 +27,6 @@ public class BookManager {
 
    //   private static String BASE_NOVEL_URL = "/novel/the-experimental-log-of-the-crazy-lich/elcl-chapter-";
 //   private static String BASE_URL = "http://gravitytales.com";
-   private String bookUrl = "https://www.wuxiaworld.com/ssn-index/ssn-chapter-";
    private int currentChapter = 1;
    private int loadChapterNumber;
    private ReadPresenter readPresenter;
@@ -40,7 +51,7 @@ public class BookManager {
    }
 
    public void changeBook(String bookUrl) {
-      this.bookUrl = bookUrl;
+//      this.bookUrl = bookUrl;
    }
 
    private void fromCacheOrNetwork(int number) {
@@ -48,8 +59,20 @@ public class BookManager {
       Chapter chapter = objectBox.queryChapter(number);
       if (chapter == null) {
          loading = true;
-         network.loadChapterFromNetwork(bookUrl, number);
-      } else if (willShow) {
+         Retrofit retrofit = new Retrofit.Builder()
+               .baseUrl("http://www.wuxiaworld.com/")
+               .addConverterFactory(GsonConverterFactory.create())
+               .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+               .build();
+         WuxiaService wuxiaService = retrofit.create(WuxiaService.class);
+         ArrayList<String> list;
+         wuxiaService.getSSNChapter(number)
+                     .subscribeOn(Schedulers.newThread())
+                     .observeOn(AndroidSchedulers.mainThread())
+                     .subscribe(responseBody -> {
+                        loadChapter(ChapterParser.parse(Jsoup.parse(responseBody.string())));
+                     });
+      } else {
          displayChapter(chapter);
       }
    }

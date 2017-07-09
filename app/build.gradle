@@ -12,6 +12,9 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
+        jackOptions {
+            enabled true
+        }
         applicationId "read.gravitytales"
         minSdkVersion 23
         targetSdkVersion 25
@@ -25,7 +28,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
 }
 
 dependencies {
@@ -48,4 +54,15 @@ dependencies {
 
     // object box database
     compile 'io.objectbox:objectbox-android:0.9.9'
+
+    compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+
+    // rx
+    compile 'io.reactivex.rxjava2:rxjava:2.0.6'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+
+    compile 'com.google.dagger:dagger:2.0'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.0'
+
 }
