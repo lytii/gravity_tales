@@ -8,5 +8,4 @@ import retrofit2.http.Path;
 public interface WuxiaService {
    @GET("ssn-index/ssn-chapter-{number}")
    Observable<ResponseBody> getSSNChapter(@Path("number") int number);
-
 }

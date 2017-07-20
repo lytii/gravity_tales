@@ -8,6 +8,8 @@ import android.preference.PreferenceManager;
 import android.text.Html;
 import android.widget.Toast;
 
+import java.util.Map;
+
 import read.gravitytales.objects.Chapter;
 import read.gravitytales.objects.ObjectBox;
 
@@ -17,6 +19,7 @@ public class ReadPresenter {
    private BookManager bookManager;
    private ObjectBox objectBox;
    private ChapterAdapter chapterAdapter;
+   private Map<String, Integer> currentChapters;
 
    private SharedPreferences sharedPreferences;
 
@@ -115,6 +118,11 @@ public class ReadPresenter {
          readActivity.showLoading();
          bookManager.jumpToChapter(chapter);
       }
+   }
+
+   public void makeErrorToast(Throwable throwable) {
+      readActivity.stopLoading();
+      Toast.makeText(readActivity, "Error: " + throwable, Toast.LENGTH_SHORT).show();
    }
 
 

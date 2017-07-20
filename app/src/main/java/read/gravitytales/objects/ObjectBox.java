@@ -1,12 +1,15 @@
 package read.gravitytales.objects;
 
 import android.app.Activity;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.objectbox.Box;
 import io.objectbox.BoxStore;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * wrapper class to use objectbox
@@ -21,7 +24,7 @@ public class ObjectBox {
    /**
     * Adds new chapter to chapter box/paragraph box
     */
-   public void putChapter(ArrayList<String> chapterItems, int chapterNumber) {
+   public Chapter storeChapter(ArrayList<String> chapterItems, int chapterNumber) {
       // Make new chapter
       Chapter chapter = new Chapter();
       chapter.setChapterNumber(chapterNumber);
@@ -40,6 +43,8 @@ public class ObjectBox {
          paragraphBox.put(newParagraph);
          paragraphs.add(newParagraph);
       }
+      Log.d(TAG, "storeChapter: " + chapterNumber);
+      return chapter;
    }
 
    /**

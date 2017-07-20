@@ -5,11 +5,15 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.ResponseBody;
+
 public final class ChapterParser {
-   public static ArrayList<String> parse(Document toParse) {
+   public static ArrayList<String> parse(ResponseBody responseBody) throws IOException {
+      Document toParse = Jsoup.parse(responseBody.string());
       Elements chapterContent = toParse.select("div#chapterContent");
       if (chapterContent.size() == 0) // backup parsing
          chapterContent = toParse.select("div [itemprop='articleBody']");
@@ -43,4 +47,6 @@ public final class ChapterParser {
       }
       return paragraphs;
    }
+
+
 }
