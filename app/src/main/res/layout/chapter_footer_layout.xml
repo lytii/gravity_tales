@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@id/chapter_buttons"
+              xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              app:layout_scrollFlags="scroll|enterAlways"
+              android:orientation="horizontal"
+              xmlns:app="http://schemas.android.com/apk/res-auto">
+
+   <Button
+      android:id="@+id/prev_button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:onClick="prevChapter"
+      android:text="Previous" />
+
+   <Button
+      android:id="@+id/jump_button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:onClick="jump"
+      android:text="Jump To" />
+
+   <Button
+      android:id="@+id/next_button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:onClick="nextChapter"
+      android:text="Next" />
+</LinearLayout>

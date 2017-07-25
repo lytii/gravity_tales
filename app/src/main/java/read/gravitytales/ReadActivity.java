@@ -28,7 +28,7 @@ public class ReadActivity extends AppCompatActivity {
 
    LastItemDetector lastItemDetector;
    LinearLayoutManager chapterLayoutManager;
-
+   Menu globalMenu;
    ReadPresenter presenter;
 
    @BindView(R.id.toolbar)
@@ -53,8 +53,18 @@ public class ReadActivity extends AppCompatActivity {
    @Override
    public boolean onCreateOptionsMenu(Menu menu) {
       getMenuInflater().inflate(R.menu.chapter_menu, menu);
+      globalMenu = menu;
       return true;
    }
+
+   public void prevChapter(View view) {
+      presenter.showPrevChapter();
+   }
+
+   public void nextChapter(View view) {
+      presenter.showNextChapter();
+   }
+
 
    @Override
    public boolean onOptionsItemSelected(MenuItem item) {
@@ -66,7 +76,7 @@ public class ReadActivity extends AppCompatActivity {
             presenter.showNextChapter();
             break;
          case R.id.menu_jump:
-            jump();
+            jump(toolbar);
             break;
          case R.id.menu_book:
             changeBook();
@@ -117,6 +127,14 @@ public class ReadActivity extends AppCompatActivity {
       imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
    }
+
+   /**
+    * wrapper method for view to enter chapter to jump to
+    */
+   public void jump(View view) {
+      jump();
+   }
+
    /**
     * Opens a dialog to input Chapter Number
     * Loads from network or cache to display Chapter

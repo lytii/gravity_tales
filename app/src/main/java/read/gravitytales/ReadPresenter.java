@@ -6,12 +6,15 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.text.Html;
+import android.util.Log;
 import android.widget.Toast;
 
-import java.util.Map;
-
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import read.gravitytales.objects.Chapter;
 import read.gravitytales.objects.ObjectBox;
+
+import static android.content.ContentValues.TAG;
 
 public class ReadPresenter {
 
@@ -19,7 +22,6 @@ public class ReadPresenter {
    private BookManager bookManager;
    private ObjectBox objectBox;
    private ChapterAdapter chapterAdapter;
-   private Map<String, Integer> currentChapters;
 
    private SharedPreferences sharedPreferences;
 
@@ -83,41 +85,36 @@ public class ReadPresenter {
       objectBox = new ObjectBox(readActivity);
       bookManager = new BookManager(this);
       sharedPreferences = PreferenceManager.getDefaultSharedPreferences(readActivity);
+      ButterKnife.bind(readActivity);
    }
 
    /**
     * Used when clicking next button
     * to show next chapter
     */
+   @OnClick(R.id.next_button)
    public void showNextChapter() {
-      if (hasNetwork()) {
          readActivity.showLoading();
          bookManager.showNextChapter();
-      }
    }
 
    /**
     * Used when clicking prev button
     * to show prev chapter
     */
+   @OnClick(R.id.prev_button)
    public void showPrevChapter() {
-      if (hasNetwork()) {
          readActivity.showLoading();
          bookManager.showPrevChapter();
-      }
    }
 
    public void preLoadNextChapter() {
-      if (hasNetwork()) {
          bookManager.preLoadNextChapter();
-      }
    }
 
    public void jumpToChapter(int chapter) {
-      if (hasNetwork()) {
          readActivity.showLoading();
          bookManager.jumpToChapter(chapter);
-      }
    }
 
    public void makeErrorToast(Throwable throwable) {
@@ -125,17 +122,12 @@ public class ReadPresenter {
       Toast.makeText(readActivity, "Error: " + throwable, Toast.LENGTH_SHORT).show();
    }
 
-
    public boolean hasNetwork() {
       ConnectivityManager cm =
             (ConnectivityManager) readActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
       NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-      boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-      if (!isConnected) {
-         Toast.makeText(readActivity, "No Network", Toast.LENGTH_SHORT).show();
-      }
-      return isConnected;
+      return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
    }
 
    public ObjectBox getObjectBox() {
