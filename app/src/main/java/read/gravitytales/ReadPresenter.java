@@ -6,15 +6,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.text.Html;
-import android.util.Log;
 import android.widget.Toast;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import read.gravitytales.objects.Chapter;
 import read.gravitytales.objects.ObjectBox;
-
-import static android.content.ContentValues.TAG;
 
 public class ReadPresenter {
 
@@ -58,6 +55,7 @@ public class ReadPresenter {
       }
       readActivity.setTitle(Html.fromHtml(title));
       readActivity.stopLoading();
+
    }
 
    /**

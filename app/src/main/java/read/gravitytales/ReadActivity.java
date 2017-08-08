@@ -9,8 +9,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -19,6 +21,7 @@ import android.widget.ProgressBar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.content.ContentValues.TAG;
 import static read.gravitytales.R.style.noTitleDialog;
 
 public class ReadActivity extends AppCompatActivity {
@@ -38,16 +41,47 @@ public class ReadActivity extends AppCompatActivity {
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_read);
-
       ButterKnife.bind(this);
-
-      chapterLayoutManager = new LinearLayoutManager(this);
-      chapterRecyclerView.setLayoutManager(chapterLayoutManager);
-
-      lastItemDetector = new LastItemDetector();
-      chapterRecyclerView.addOnScrollListener(lastItemDetector);
+      setupChapterView();
       presenter = new ReadPresenter(this);
       setSupportActionBar(toolbar);
+   }
+
+   private void setupChapterView() {
+      chapterLayoutManager = new LinearLayoutManager(this);
+      chapterRecyclerView.setLayoutManager(chapterLayoutManager);
+      lastItemDetector = new LastItemDetector();
+      chapterRecyclerView.addOnScrollListener(lastItemDetector);
+      chapterRecyclerView.setOnTouchListener(new View.OnTouchListener() {
+         float downX = 0;
+         float downY = 0;
+
+         @Override
+         public boolean onTouch(View view, MotionEvent motionEvent) {
+            switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+               case MotionEvent.ACTION_UP:
+                  float deltaY = motionEvent.getY() - downY;
+                  float deltaX = motionEvent.getX() - downX;
+                  Log.d(TAG, "onTouch: delta X " + deltaX + " Y " + deltaY);
+                  // right to left (NEXT)
+                  if (deltaX <= -200 && Math.abs(deltaY) <= 50) {
+                     Log.d(TAG, "onTouch: swipe left");
+                     presenter.showNextChapter();
+                  }
+                  // left to right (PREV)
+                  if (deltaX >= 200 && Math.abs(deltaY) <= 50) {
+                     Log.d(TAG, "onTouch: swipe right");
+                     presenter.showPrevChapter();
+                  }
+               case MotionEvent.ACTION_DOWN:
+                  Log.d(TAG, "onTouch: down");
+                  downX = motionEvent.getX();
+                  downY = motionEvent.getY();
+            }
+
+            return false;
+         }
+      });
    }
 
    @Override
@@ -183,9 +217,10 @@ public class ReadActivity extends AppCompatActivity {
       chapterRecyclerView.removeOnScrollListener(lastItemDetector);
       chapterRecyclerView.setAdapter(chapterAdapter);
       chapterRecyclerView.addOnScrollListener(lastItemDetector);
+      ;
    }
 
-   public class LastItemDetector extends RecyclerView.OnScrollListener {
+   private class LastItemDetector extends RecyclerView.OnScrollListener {
 
       public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
          if (isAtBottom(recyclerView)) {

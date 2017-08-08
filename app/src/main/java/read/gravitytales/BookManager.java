@@ -71,8 +71,9 @@ public class BookManager {
          loading = true;
          bookNetwork.getSSNChapter(number)
                     .map(ChapterParser::parse)
-                    .subscribe(chapterStrings -> storeChapter(chapterStrings, number),
-                               this::makeErrorToast);
+                    .map(chapterStrings -> objectBox.storeChapter(chapterStrings, number))
+                    .observeOn(AndroidSchedulers.mainThread()) // switch thread for error toast
+                    .subscribe(ignore -> {}, this::makeErrorToast);
       }
    }
 
