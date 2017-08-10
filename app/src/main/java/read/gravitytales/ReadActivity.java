@@ -203,7 +203,7 @@ public class ReadActivity extends AppCompatActivity {
       progressBar.setVisibility(View.VISIBLE);
    }
 
-   public void stopLoading() {
+   public void doneLoading() {
       ProgressBar progressBar = (ProgressBar) findViewById(R.id.loading_bar);
       progressBar.setVisibility(View.INVISIBLE);
    }

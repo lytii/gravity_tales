@@ -58,7 +58,7 @@ public class ReadPresenter {
       }
 
       readActivity.setTitle(Html.fromHtml(title));
-      readActivity.stopLoading();
+      readActivity.doneLoading();
 
    }
 
@@ -120,7 +120,7 @@ public class ReadPresenter {
    }
 
    public void makeErrorToast(Throwable throwable) {
-      readActivity.stopLoading();
+      readActivity.doneLoading();
       Log.d(TAG, "makeErrorToast: " + throwable);
       Toast.makeText(readActivity, "Error: " + throwable, Toast.LENGTH_SHORT).show();
    }
@@ -135,5 +135,13 @@ public class ReadPresenter {
 
    public ChapterDAO getChapterDao() {
       return chapterDAO;
+   }
+
+   public void showLoading() {
+      readActivity.showLoading();
+   }
+
+   public void doneLoading() {
+      readActivity.doneLoading();
    }
 }

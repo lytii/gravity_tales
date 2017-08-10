@@ -56,9 +56,12 @@ public class BookManager {
 //      this.bookUrl = bookUrl;
    }
 
-   private void fromCache(int number) {
+   /**
+    * load chapter from cache to display chapter
+    */
+   private void displayChapterFromCache(int number) {
       loading = true;
-      Log.d(TAG, "fromCache: ");
+      Log.d(TAG, "displayChapterFromCache: ");
       chapterDAO.getChapter(number)
                 .subscribeOn(Schedulers.io())
                 .map(ChapterListingParagraphs::putInOrder)
@@ -66,6 +69,10 @@ public class BookManager {
                 .subscribe(this::displayChapter, ignore -> fromNetwork(number));
    }
 
+   /**
+    * load chapter from network and store in cache
+    * display chapter from cache
+    */
    private void fromNetwork(int number) {
       Log.d(TAG, "fromNetwork: ");
       loading = true;
@@ -73,7 +80,7 @@ public class BookManager {
                  .map(ChapterParser::parse)
                  .map(chapterStrings -> saveChapter(chapterStrings, number))
                  .observeOn(AndroidSchedulers.mainThread())
-                 .subscribe(ignore -> fromCache(number), this::makeErrorToast);
+                 .subscribe(ignore -> displayChapterFromCache(number), this::makeErrorToast);
    }
 
    private void displayChapter(ChapterListingParagraphs chapter) {
@@ -109,7 +116,7 @@ public class BookManager {
                  .observeOn(AndroidSchedulers.mainThread())
                  .subscribe(ignore -> {
                     if (autoLoad) {
-                       fromCache(number);
+                       displayChapterFromCache(number);
                        autoLoad = false;
                     }
                  }, this::makeErrorToast);
@@ -131,11 +138,10 @@ public class BookManager {
 
    public void jumpToChapter(int chapter) {
       if (!loading) {
-         fromCache(chapter);
+         displayChapterFromCache(chapter);
       } else {
-         makeErrorToast(new Throwable("Still loading"));
+         readPresenter.showLoading();
          autoLoad = true;
-         loading = true;
       }
    }
 
