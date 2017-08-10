@@ -6,20 +6,23 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.text.Html;
+import android.util.Log;
 import android.widget.Toast;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import read.gravitytales.objects.Chapter;
-import read.gravitytales.objects.ObjectBox;
+import read.gravitytales.objects.ChapterDAO;
+import read.gravitytales.objects.ChapterDatabase;
+import read.gravitytales.objects.ChapterListingParagraphs;
+
+import static android.content.ContentValues.TAG;
 
 public class ReadPresenter {
 
    private ReadActivity readActivity;
    private BookManager bookManager;
-   private ObjectBox objectBox;
    private ChapterAdapter chapterAdapter;
-
+   private ChapterDAO chapterDAO;
    private SharedPreferences sharedPreferences;
 
    public ReadPresenter(ReadActivity readActivity) {
@@ -34,7 +37,6 @@ public class ReadPresenter {
 
    public void changeBook(String bookUrl) {
       bookManager.changeBook(bookUrl);
-      objectBox.clear();
    }
 
    /**
@@ -42,17 +44,19 @@ public class ReadPresenter {
     *
     * @param chapter
     */
-   public void displayChapter(Chapter chapter) {
-      chapterAdapter = new ChapterAdapter(chapter.getParagraphs());
+   public void displayChapter(ChapterListingParagraphs chapter) {
+      chapterAdapter = new ChapterAdapter(chapter.getText());
       readActivity.displayChapter(chapterAdapter);
-      String title = chapter.getParagraphs().get(0).getParagraphText();
+
+      String title = chapter.getText().get(0);
       if (title.contains("Next Chapter") || title.contains("Previous Chapter")) {
-         title = chapter.getParagraphs().get(1).getParagraphText();
+         title = chapter.getText().get(1);
       }
       // if chapter number isn't in title, prepend it
       if (!title.contains("" + bookManager.getCurrentChapter())) {
          title = bookManager.getCurrentChapter() + title;
       }
+
       readActivity.setTitle(Html.fromHtml(title));
       readActivity.stopLoading();
 
@@ -80,7 +84,7 @@ public class ReadPresenter {
     * initializes objects we're going to need
     */
    private void initializeStuff() {
-      objectBox = new ObjectBox(readActivity);
+      chapterDAO = ChapterDatabase.getINSTANCE(readActivity).chapterDAO();
       bookManager = new BookManager(this);
       sharedPreferences = PreferenceManager.getDefaultSharedPreferences(readActivity);
       ButterKnife.bind(readActivity);
@@ -92,8 +96,8 @@ public class ReadPresenter {
     */
    @OnClick(R.id.next_button)
    public void showNextChapter() {
-         readActivity.showLoading();
-         bookManager.showNextChapter();
+      readActivity.showLoading();
+      bookManager.showNextChapter();
    }
 
    /**
@@ -102,21 +106,22 @@ public class ReadPresenter {
     */
    @OnClick(R.id.prev_button)
    public void showPrevChapter() {
-         readActivity.showLoading();
-         bookManager.showPrevChapter();
+      readActivity.showLoading();
+      bookManager.showPrevChapter();
    }
 
    public void preLoadNextChapter() {
-         bookManager.preLoadNextChapter();
+      bookManager.isChapterInCache();
    }
 
    public void jumpToChapter(int chapter) {
-         readActivity.showLoading();
-         bookManager.jumpToChapter(chapter);
+      readActivity.showLoading();
+      bookManager.jumpToChapter(chapter);
    }
 
    public void makeErrorToast(Throwable throwable) {
       readActivity.stopLoading();
+      Log.d(TAG, "makeErrorToast: " + throwable);
       Toast.makeText(readActivity, "Error: " + throwable, Toast.LENGTH_SHORT).show();
    }
 
@@ -128,7 +133,7 @@ public class ReadPresenter {
       return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
    }
 
-   public ObjectBox getObjectBox() {
-      return objectBox;
+   public ChapterDAO getChapterDao() {
+      return chapterDAO;
    }
 }

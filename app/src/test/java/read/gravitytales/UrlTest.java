@@ -21,23 +21,10 @@ public class UrlTest {
    //   String urlString = "http://m.wuxiaworld.com/ssn-index/ssn-chapter-18/";
    String urlString = "http://www.wuxiaworld.com/ssn-index/ssn-chapter-154/";
 
-//   @Test
+   @Test
    public void parseUrl() throws IOException {
       URL url = new URL(urlString);
       System.out.println(Arrays.toString(url.getPath().split("/")));
-//      System.out.println(toParse.select("meta[property='og:title']").attr("content"));
-      Document toParse = Jsoup.connect(urlString).get();
-//      Elements chapterContent = toParse.select("div#chapterContent");
-      Elements chapterContent = toParse.select("div [itemprop='articleBody']");
-      Elements title = chapterContent.get(0).getAllElements().get(1).select("[href]");
-      for (Element e : title) {
-         System.out.println(e.attr("href"));
-      }
-//      System.out.println(title.attr("href"));
-
-      // title of page
-      Elements titleElement = toParse.select("meta[property='og:title']");
-      System.out.println(titleElement.attr("content"));
    }
 
    @Test

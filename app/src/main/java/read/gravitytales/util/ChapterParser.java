@@ -32,8 +32,11 @@ public final class ChapterParser {
 
       // add prev/next links to 0,1
       Elements links = chapterContent.select("[href]");
-      paragraphs.add(paragraphs.size(), links.get(1).attr("href"));
-      paragraphs.add(paragraphs.size(), links.get(0).attr("href"));
+
+      if (links.size() > 0) {
+         paragraphs.add(paragraphs.size(), links.get(1).attr("href"));
+         paragraphs.add(paragraphs.size(), links.get(0).attr("href"));
+      }
 
       return paragraphs;
    }
@@ -57,9 +60,9 @@ public final class ChapterParser {
       for (Node node : nodes) {
          String string = node.toString().replaceAll("<p[^>]+>|</p>|<p>", "");
          if (!string.equals(" ")
-                 && !string.equals("<hr>")
-                 && !string.equals("<br>")
-                 && !string.equals("&nbsp;")) {
+               && !string.equals("<hr>")
+               && !string.equals("<br>")
+               && !string.equals("&nbsp;")) {
             if (string.length() == 0 && first) {
                // second new line, don't add it
                first = false;

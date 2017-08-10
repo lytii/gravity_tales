@@ -139,7 +139,6 @@ public class ReadActivity extends AppCompatActivity {
    public void changeBook() {
       final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
       AlertDialog.Builder alert = new AlertDialog.Builder(this, noTitleDialog);
-
       final EditText input = new EditText(this);
       input.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS);
       alert.setTitle("Enter Book Address");

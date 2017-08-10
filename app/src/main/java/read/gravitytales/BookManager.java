@@ -4,13 +4,17 @@ package read.gravitytales;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Random;
 
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import read.gravitytales.objects.Chapter;
-import read.gravitytales.objects.ObjectBox;
-import read.gravitytales.util.ChapterParser;
+import read.gravitytales.objects.ChapterDAO;
+import read.gravitytales.objects.ChapterListingParagraphs;
+import read.gravitytales.objects.Paragraph;
 import read.gravitytales.util.BookNetwork;
+import read.gravitytales.util.ChapterParser;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -27,13 +31,15 @@ public class BookManager {
 //   private static String BASE_URL = "http://gravitytales.com";
    private int currentChapter = 1;
    private ReadPresenter readPresenter;
-   private ObjectBox objectBox;
+   private ChapterDAO chapterDAO;
    private boolean loading = false;
+   private boolean autoLoad = false;
    BookNetwork bookNetwork;
 
    public BookManager(ReadPresenter readPresenter) {
+      Log.d(TAG, "BookManager: ");
       this.readPresenter = readPresenter;
-      objectBox = readPresenter.getObjectBox();
+      chapterDAO = readPresenter.getChapterDao();
       Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://www.wuxiaworld.com/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -50,56 +56,86 @@ public class BookManager {
 //      this.bookUrl = bookUrl;
    }
 
-   private void fromCacheOrNetwork(int number) {
+   private void fromCache(int number) {
       loading = true;
-      Chapter chapter = objectBox.queryChapter(number);
-      if (chapter == null) {
-         bookNetwork.getSSNChapter(number)
-                    .map(ChapterParser::parse)
-                    .map(chapterStrings -> objectBox.storeChapter(chapterStrings, number))
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::displayChapter, this::makeErrorToast);
-      } else {
-         displayChapter(chapter);
-      }
+      Log.d(TAG, "fromCache: ");
+      chapterDAO.getChapter(number)
+                .subscribeOn(Schedulers.io())
+                .map(ChapterListingParagraphs::putInOrder)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::displayChapter, ignore -> fromNetwork(number));
    }
 
-   public void preLoadNextChapter() {
-      int number = currentChapter + 1;
-      Chapter chapter = objectBox.queryChapter(number);
-      if (chapter == null) {
-         loading = true;
-         bookNetwork.getSSNChapter(number)
-                    .map(ChapterParser::parse)
-                    .map(chapterStrings -> objectBox.storeChapter(chapterStrings, number))
-                    .observeOn(AndroidSchedulers.mainThread()) // switch thread for error toast
-                    .subscribe(ignore -> {}, this::makeErrorToast);
-      }
+   private void fromNetwork(int number) {
+      Log.d(TAG, "fromNetwork: ");
+      loading = true;
+      bookNetwork.getSSNChapter(number)
+                 .map(ChapterParser::parse)
+                 .map(chapterStrings -> saveChapter(chapterStrings, number))
+                 .observeOn(AndroidSchedulers.mainThread())
+                 .subscribe(ignore -> fromCache(number), this::makeErrorToast);
    }
 
-   private void displayChapter(Chapter chapter) {
+   private void displayChapter(ChapterListingParagraphs chapter) {
+      Log.d(TAG, "displayChapter: ");
       currentChapter = chapter.getChapterNumber();
       readPresenter.bookmarkChapter(currentChapter);
       readPresenter.displayChapter(chapter);
       loading = false;
    }
 
-   private void storeChapter(ArrayList<String> chapterStrings, int number) {
-      objectBox.storeChapter(chapterStrings, number);
-      loading = false;
+   public Single<ChapterListingParagraphs> saveChapter(ArrayList<String> chapter, int number) {
+      Log.d(TAG, "saveChapter: ");
+      Chapter newChapter = new Chapter();
+      newChapter.setNumber(number);
+      newChapter.setId(number);
+
+      int i = 0;
+      for (String text : chapter) {
+         Paragraph newParagraph = new Paragraph(text);
+         newParagraph.setChapterId(newChapter.getId());
+         newParagraph.setPosition(i++);
+         newParagraph.setId(new Random().nextInt());
+         chapterDAO.addParagraph(newParagraph);
+      }
+      chapterDAO.addChapter(newChapter);
+      return chapterDAO.getChapter(number);
+   }
+
+   private void preFromNetwork(int number) {
+      bookNetwork.getSSNChapter(number)
+                 .map(ChapterParser::parse)
+                 .map(chapterStrings -> saveChapter(chapterStrings, number))
+                 .observeOn(AndroidSchedulers.mainThread())
+                 .subscribe(ignore -> {
+                    if (autoLoad) {
+                       fromCache(number);
+                       autoLoad = false;
+                    }
+                 }, this::makeErrorToast);
+   }
+
+   public void isChapterInCache() {
+      loading = true;
+      int number = currentChapter + 1;
+      chapterDAO.getChapter(number)
+                .map(ChapterListingParagraphs::putInOrder)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(ignore -> loading = false, ignore -> preFromNetwork(number));
    }
 
    private void makeErrorToast(Throwable throwable) {
-      loading = false;
       readPresenter.makeErrorToast(throwable);
+      loading = false;
    }
 
    public void jumpToChapter(int chapter) {
       if (!loading) {
-         fromCacheOrNetwork(chapter);
+         fromCache(chapter);
       } else {
-
          makeErrorToast(new Throwable("Still loading"));
+         autoLoad = true;
+         loading = true;
       }
    }
 

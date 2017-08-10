@@ -4,7 +4,7 @@ apply plugin: 'io.objectbox'
 repositories {
     jcenter()
     maven {
-        url "http://objectbox.net/beta-repo/"
+        url "https://maven.google.com"
     }
 }
 
@@ -33,12 +33,11 @@ android {
     compileOptions {
         targetCompatibility 1.8
         sourceCompatibility 1.8
+        incremental false
     }
 }
 
 dependencies {
-    // jsoup HTML parser library @ http://jsoup.org/
-    compile 'org.jsoup:jsoup:1.10.2'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -52,13 +51,27 @@ dependencies {
     // butterknife annotations
     compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-    // object box database
-    compile 'io.objectbox:objectbox-android:0.9.9'
+    // retrofit
     compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile 'com.google.code.gson:gson:2.8.0'
+
     // rx
     compile 'io.reactivex.rxjava2:rxjava:2.0.6'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
     compile 'com.google.dagger:dagger:2.0'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.0'
+
+    // room
+    compile "android.arch.lifecycle:runtime:1.0.0-alpha5"
+    compile "android.arch.lifecycle:extensions:1.0.0-alpha5"
+    annotationProcessor "android.arch.lifecycle:compiler:1.0.0-alpha5"
+    compile 'android.arch.persistence.room:runtime:1.0.0-alpha5'
+    annotationProcessor 'android.arch.persistence.room:compiler:1.0.0-alpha5'
+    testCompile "android.arch.persistence.room:testing:1.0.0-alpha5"
+    compile "android.arch.persistence.room:rxjava2:1.0.0-alpha5"
+
+    // jsoup HTML parser library @ http://jsoup.org/
+    compile 'org.jsoup:jsoup:1.10.2'
+
 }

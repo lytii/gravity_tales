@@ -3,7 +3,6 @@ package read.gravitytales;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,13 +13,12 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import read.gravitytales.objects.Paragraph;
 
 public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHolder> {
 
    private static final int PARAGRAPH = 603;
    private static final int FOOTER = 365;
-   private List<Paragraph> paragraphList;
+   private List<String> paragraphList;
 
    public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -34,7 +32,7 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHold
       }
    }
 
-   public ChapterAdapter(List<Paragraph> paragraphList) {
+   public ChapterAdapter(List<String> paragraphList) {
       this.paragraphList = paragraphList;
    }
 
@@ -61,7 +59,7 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHold
    @SuppressWarnings("deprecation")
    public void onBindViewHolder(ViewHolder holder, int position) {
       if(position != paragraphList.size()) {
-         String textItem = paragraphList.get(position).getParagraphText();
+         String textItem = paragraphList.get(position);
          holder.textView.setText(Html.fromHtml(textItem));
       }
    }
