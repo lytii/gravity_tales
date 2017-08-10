@@ -1,8 +1,6 @@
 package read.gravitytales;
 
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -18,8 +16,6 @@ import read.gravitytales.util.ChapterParser;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * Handles setting/getting from cache
@@ -37,7 +33,6 @@ public class BookManager {
    BookNetwork bookNetwork;
 
    public BookManager(ReadPresenter readPresenter) {
-      Log.d(TAG, "BookManager: ");
       this.readPresenter = readPresenter;
       chapterDAO = readPresenter.getChapterDao();
       Retrofit retrofit = new Retrofit.Builder()
@@ -61,7 +56,6 @@ public class BookManager {
     */
    private void displayChapterFromCache(int number) {
       loading = true;
-      Log.d(TAG, "displayChapterFromCache: ");
       chapterDAO.getChapter(number)
                 .subscribeOn(Schedulers.io())
                 .map(ChapterListingParagraphs::putInOrder)
@@ -74,7 +68,6 @@ public class BookManager {
     * display chapter from cache
     */
    private void fromNetwork(int number) {
-      Log.d(TAG, "fromNetwork: ");
       loading = true;
       bookNetwork.getSSNChapter(number)
                  .map(ChapterParser::parse)
@@ -84,7 +77,6 @@ public class BookManager {
    }
 
    private void displayChapter(ChapterListingParagraphs chapter) {
-      Log.d(TAG, "displayChapter: ");
       currentChapter = chapter.getChapterNumber();
       readPresenter.bookmarkChapter(currentChapter);
       readPresenter.displayChapter(chapter);
@@ -92,7 +84,6 @@ public class BookManager {
    }
 
    public Single<ChapterListingParagraphs> saveChapter(ArrayList<String> chapter, int number) {
-      Log.d(TAG, "saveChapter: ");
       Chapter newChapter = new Chapter();
       newChapter.setNumber(number);
       newChapter.setId(number);
@@ -119,6 +110,7 @@ public class BookManager {
                        displayChapterFromCache(number);
                        autoLoad = false;
                     }
+                    loading = false;
                  }, this::makeErrorToast);
    }
 
@@ -126,7 +118,6 @@ public class BookManager {
       loading = true;
       int number = currentChapter + 1;
       chapterDAO.getChapter(number)
-                .map(ChapterListingParagraphs::putInOrder)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(ignore -> loading = false, ignore -> preFromNetwork(number));
    }
