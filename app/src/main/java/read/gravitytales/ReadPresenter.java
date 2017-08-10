@@ -45,12 +45,12 @@ public class ReadPresenter {
     * @param chapter
     */
    public void displayChapter(ChapterListingParagraphs chapter) {
-      chapterAdapter = new ChapterAdapter(chapter.getText());
+      chapterAdapter = new ChapterAdapter(chapter.getParagraphs());
       readActivity.displayChapter(chapterAdapter);
 
-      String title = chapter.getText().get(0);
+      String title = chapter.getParagraphs().get(0).getText();
       if (title.contains("Next Chapter") || title.contains("Previous Chapter")) {
-         title = chapter.getText().get(1);
+         title = chapter.getParagraphs().get(1).getText();
       }
       // if chapter number isn't in title, prepend it
       if (!title.contains("" + bookManager.getCurrentChapter())) {

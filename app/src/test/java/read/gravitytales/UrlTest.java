@@ -24,7 +24,12 @@ public class UrlTest {
    @Test
    public void parseUrl() throws IOException {
       URL url = new URL(urlString);
-      System.out.println(Arrays.toString(url.getPath().split("/")));
+      System.out.println(Arrays.toString(url.getPath().split("/")));// title of page
+
+      // title of page
+      Document toParse = Jsoup.connect(urlString).get();
+      Elements titleElement = toParse.select("meta[property='og:title']");
+      System.out.println(titleElement.attr("content"));
    }
 
    @Test

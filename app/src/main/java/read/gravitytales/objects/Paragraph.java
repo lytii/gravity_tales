@@ -15,6 +15,10 @@ public class Paragraph {
 
    String text;
 
+   public String getText() {
+      return text;
+   }
+
    public Paragraph(String text) {
       this.text = text;
    }

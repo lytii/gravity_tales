@@ -13,12 +13,13 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import read.gravitytales.objects.Paragraph;
 
 public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHolder> {
 
    private static final int PARAGRAPH = 603;
    private static final int FOOTER = 365;
-   private List<String> paragraphList;
+   private List<Paragraph> paragraphList;
 
    public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -32,7 +33,7 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHold
       }
    }
 
-   public ChapterAdapter(List<String> paragraphList) {
+   public ChapterAdapter(List<Paragraph> paragraphList) {
       this.paragraphList = paragraphList;
    }
 
@@ -59,7 +60,7 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHold
    @SuppressWarnings("deprecation")
    public void onBindViewHolder(ViewHolder holder, int position) {
       if(position != paragraphList.size()) {
-         String textItem = paragraphList.get(position);
+         String textItem = paragraphList.get(position).getText();
          holder.textView.setText(Html.fromHtml(textItem));
       }
    }
