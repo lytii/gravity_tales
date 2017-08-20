@@ -6,6 +6,7 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 
 @Dao
@@ -18,7 +19,7 @@ public interface ChapterDAO {
    List<Chapter> getBook(String title);
 
    @Query("SELECT * FROM Chapter where number = :number" )
-   Single<ChapterListingParagraphs> getChapter(int number);
+   Maybe<ChapterListingParagraphs> getChapter(int number);
 
    @Insert
    void addChapter(Chapter chapter);

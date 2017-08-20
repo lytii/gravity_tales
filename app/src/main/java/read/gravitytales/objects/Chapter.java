@@ -15,6 +15,13 @@ public class Chapter {
 
    private String url;
 
+   private String title;
+
+   private String nextChapterUrl;
+
+   private String prevChapterUrl;
+
+
    public long getId() {
       return id;
    }
@@ -45,5 +52,29 @@ public class Chapter {
 
    public void setNumber(int number) {
       this.number = number;
+   }
+
+   public String getTitle() {
+      return title;
+   }
+
+   public void setTitle(String title) {
+      this.title = title;
+   }
+
+   public String getNextChapterUrl() {
+      return nextChapterUrl;
+   }
+
+   public void setNextChapterUrl(String nextChapterUrl) {
+      this.nextChapterUrl = nextChapterUrl;
+   }
+
+   public String getPrevChapterUrl() {
+      return prevChapterUrl;
+   }
+
+   public void setPrevChapterUrl(String prevChapterUrl) {
+      this.prevChapterUrl = prevChapterUrl;
    }
 }

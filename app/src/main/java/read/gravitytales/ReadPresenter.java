@@ -25,6 +25,8 @@ public class ReadPresenter {
    private ChapterDAO chapterDAO;
    private SharedPreferences sharedPreferences;
 
+   private boolean loading = false;
+
    public ReadPresenter(ReadActivity readActivity) {
       this.readActivity = readActivity;
       initializeStuff(); // using readActivity
@@ -48,7 +50,7 @@ public class ReadPresenter {
       chapterAdapter = new ChapterAdapter(chapter.getParagraphs());
       readActivity.displayChapter(chapterAdapter);
 
-      String title = chapter.getParagraphs().get(0).getText();
+      String title = chapter.getParagraphs().remove(0).getText();
       if (title.contains("Next Chapter") || title.contains("Previous Chapter")) {
          title = chapter.getParagraphs().get(1).getText();
       }
@@ -58,7 +60,7 @@ public class ReadPresenter {
       }
 
       readActivity.setTitle(Html.fromHtml(title));
-      readActivity.doneLoading();
+      endLoadingStatus();
 
    }
 
@@ -96,8 +98,12 @@ public class ReadPresenter {
     */
    @OnClick(R.id.next_button)
    public void showNextChapter() {
-      readActivity.showLoading();
-      bookManager.showNextChapter();
+      if (!loading) {
+         bookManager.showNextChapter();
+         startLoadingStatus();
+      } else {
+
+      }
    }
 
    /**
@@ -106,22 +112,27 @@ public class ReadPresenter {
     */
    @OnClick(R.id.prev_button)
    public void showPrevChapter() {
-      readActivity.showLoading();
-      bookManager.showPrevChapter();
+      if (!loading) {
+         bookManager.showPrevChapter();
+         startLoadingStatus();
+      }
    }
 
    public void preLoadNextChapter() {
-      bookManager.isChapterInCache();
+      loading = true;
+      bookManager.preLoadChapter();
    }
 
    public void jumpToChapter(int chapter) {
-      readActivity.showLoading();
-      bookManager.jumpToChapter(chapter);
+      if (!loading) {
+         startLoadingStatus();
+         bookManager.jumpToChapter(chapter);
+      }
    }
 
-   public void makeErrorToast(Throwable throwable) {
-      readActivity.doneLoading();
-      Log.d(TAG, "makeErrorToast: " + throwable);
+   public void makeLoadingErrorToast(Throwable throwable) {
+      endLoadingStatus();
+      Log.d(TAG, "makeLoadingErrorToast: " + throwable);
       Toast.makeText(readActivity, "Error: " + throwable, Toast.LENGTH_SHORT).show();
    }
 
@@ -137,11 +148,13 @@ public class ReadPresenter {
       return chapterDAO;
    }
 
-   public void showLoading() {
+   public void startLoadingStatus() {
+      loading = true;
       readActivity.showLoading();
    }
 
-   public void doneLoading() {
+   public void endLoadingStatus() {
       readActivity.doneLoading();
+      loading = false;
    }
 }

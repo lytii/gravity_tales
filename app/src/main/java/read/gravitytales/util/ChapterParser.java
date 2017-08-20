@@ -11,9 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.ResponseBody;
+import read.gravitytales.objects.Chapter;
+import read.gravitytales.objects.Paragraph;
 
 public final class ChapterParser {
+
    public static ArrayList<String> parse(ResponseBody responseBody) throws IOException {
+      // parse response to get chapter text
       Document toParse = Jsoup.parse(responseBody.string());
       Elements chapterContent = toParse.select("div#chapterContent");
       if (chapterContent.size() == 0) // backup parsing
@@ -21,6 +25,8 @@ public final class ChapterParser {
       List<Node> all = chapterContent.get(0).childNodes();
 
       ArrayList<String> paragraphs = removeBlanks(all);
+
+      // remove if first line is `Next Chapter Previous Chapter`
       if (paragraphs.get(0).contains("Next Chapter") || paragraphs.get(0).contains("Previous Chapter")) {
          String title = paragraphs.get(0);
          Elements spanSelect = Jsoup.parse(title).select("span");
@@ -30,9 +36,11 @@ public final class ChapterParser {
             paragraphs.remove(0);
       }
 
+      // add title as first
+      paragraphs.add(0, toParse.select("meta[property='og:title']").attr("content"));
+
       // add prev/next links to 0,1
       Elements links = chapterContent.select("[href]");
-
       if (links.size() > 0) {
          paragraphs.add(paragraphs.size(), links.get(1).attr("href"));
          paragraphs.add(paragraphs.size(), links.get(0).attr("href"));
@@ -67,7 +75,7 @@ public final class ChapterParser {
                // second new line, don't add it
                first = false;
             } else {
-               // first new line usually has meaning
+               // first new line usually has 'some' meaning
                first = string.length() == 0;
                paragraphs.add(string.replaceAll("&nbsp;", ""));
             }

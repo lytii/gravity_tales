@@ -1,5 +1,7 @@
 package read.gravitytales;
 
+import android.arch.persistence.room.EmptyResultSetException;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,6 +16,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import io.reactivex.Observable;
+import read.gravitytales.objects.ChapterListingParagraphs;
 
 import static read.gravitytales.util.ChapterParser.removeBlanks;
 
@@ -39,7 +44,6 @@ public class UrlTest {
       if (chapterContent.size() == 0) // backup parsing
          chapterContent = toParse.select("div [itemprop='articleBody']");
       List<Node> all = chapterContent.get(0).childNodes();
-      ArrayList<String> paragraphs = removeBlanks(all);
       Elements links = chapterContent.get(0).child(0).select("[href]");
       System.out.println(links.get(0).attr("href"));
       System.out.println(links.get(1).attr("href"));
@@ -76,4 +80,21 @@ public class UrlTest {
          }
       }
    }
+
+   @Test
+   public void throwingExceptions() {
+      Observable.empty();
+      Observable.just("")
+                .map(a -> {
+                   throw new EmptyResultSetException("throwing");
+                })
+                .onErrorReturn(throwable -> {
+                   if(throwable instanceof EmptyResultSetException) {
+                      return "instanceof";
+                   } else {
+                      return "failed";
+                   }
+                }).subscribe(a -> {System.out.println("subscribe " + a);});
+   }
+
 }

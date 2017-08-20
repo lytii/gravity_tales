@@ -1,10 +1,10 @@
 package read.gravitytales;
 
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-import io.reactivex.Single;
+import io.reactivex.Maybe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import read.gravitytales.objects.Chapter;
@@ -23,12 +23,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class BookManager {
 
-   //   private static String BASE_NOVEL_URL = "/novel/the-experimental-log-of-the-crazy-lich/elcl-chapter-";
-//   private static String BASE_URL = "http://gravitytales.com";
    private int currentChapter = 1;
    private ReadPresenter readPresenter;
    private ChapterDAO chapterDAO;
-   private boolean loading = false;
    private boolean autoLoad = false;
    BookNetwork bookNetwork;
 
@@ -54,36 +51,27 @@ public class BookManager {
    /**
     * load chapter from cache to display chapter
     */
-   private void displayChapterFromCache(int number) {
-      loading = true;
+   private void loadChapter(int number) {
       chapterDAO.getChapter(number)
+                .toObservable()
                 .subscribeOn(Schedulers.io())
+                .switchIfEmpty(
+                      bookNetwork.getESPChapter(number)
+                                 .map(ChapterParser::parse)
+                                 .flatMapMaybe(paragraphList -> saveChapter(paragraphList, number))
+                )
                 .map(ChapterListingParagraphs::putInOrder)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::displayChapter, ignore -> fromNetwork(number));
-   }
-
-   /**
-    * load chapter from network and store in cache
-    * display chapter from cache
-    */
-   private void fromNetwork(int number) {
-      loading = true;
-      bookNetwork.getSSNChapter(number)
-                 .map(ChapterParser::parse)
-                 .map(chapterStrings -> saveChapter(chapterStrings, number))
-                 .observeOn(AndroidSchedulers.mainThread())
-                 .subscribe(ignore -> displayChapterFromCache(number), this::makeErrorToast);
+                .subscribe(this::displayChapter, readPresenter::makeLoadingErrorToast);
    }
 
    private void displayChapter(ChapterListingParagraphs chapter) {
       currentChapter = chapter.getChapterNumber();
       readPresenter.bookmarkChapter(currentChapter);
       readPresenter.displayChapter(chapter);
-      loading = false;
    }
 
-   public Single<ChapterListingParagraphs> saveChapter(ArrayList<String> chapter, int number) {
+   public Maybe<ChapterListingParagraphs> saveChapter(List<String> chapter, int number) {
       Chapter newChapter = new Chapter();
       newChapter.setNumber(number);
       newChapter.setId(number);
@@ -96,44 +84,28 @@ public class BookManager {
          newParagraph.setId(new Random().nextInt());
          chapterDAO.addParagraph(newParagraph);
       }
+
       chapterDAO.addChapter(newChapter);
       return chapterDAO.getChapter(number);
    }
 
-   private void preFromNetwork(int number) {
-      bookNetwork.getSSNChapter(number)
-                 .map(ChapterParser::parse)
-                 .map(chapterStrings -> saveChapter(chapterStrings, number))
-                 .observeOn(AndroidSchedulers.mainThread())
-                 .subscribe(ignore -> {
-                    if (autoLoad) {
-                       displayChapterFromCache(number);
-                       autoLoad = false;
-                    }
-                    loading = false;
-                 }, this::makeErrorToast);
-   }
-
-   public void isChapterInCache() {
-      loading = true;
+   public void preLoadChapter() {
       int number = currentChapter + 1;
-      chapterDAO.getChapter(number)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(ignore -> loading = false, ignore -> preFromNetwork(number));
-   }
-
-   private void makeErrorToast(Throwable throwable) {
-      readPresenter.makeErrorToast(throwable);
-      loading = false;
+      bookNetwork.getESPChapter(number)
+                 .map(ChapterParser::parse)
+                 .flatMapMaybe(paragraphList -> saveChapter(paragraphList, number))
+                 .observeOn(AndroidSchedulers.mainThread())
+                 .subscribe(savedChapter ->
+                            {
+                               if (autoLoad) {
+                                  displayChapter(savedChapter);
+                               }
+                               readPresenter.endLoadingStatus();
+                            }, readPresenter::makeLoadingErrorToast);
    }
 
    public void jumpToChapter(int chapter) {
-      if (!loading) {
-         displayChapterFromCache(chapter);
-      } else {
-         readPresenter.showLoading();
-         autoLoad = true;
-      }
+      loadChapter(chapter);
    }
 
    public void showNextChapter() {
