@@ -103,12 +103,6 @@ public class ReadActivity extends AppCompatActivity {
    @Override
    public boolean onOptionsItemSelected(MenuItem item) {
       switch (item.getItemId()) {
-         case R.id.menu_prev:
-            presenter.showPrevChapter();
-            break;
-         case R.id.menu_next:
-            presenter.showNextChapter();
-            break;
          case R.id.menu_jump:
             jump(toolbar);
             break;

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-   <color name="whiteBG">#FFFFFF</color>
+   <color name="whiteBG">#ECEFF1</color>
    <color name="blackBG">#000000</color>
-   <color name="colorPrimary">#0051B5</color>
-   <color name="colorPrimaryDark">#003555</color>
-   <color name="colorAccent">#a5f4e2</color>
 
-   <color name="black_overlay">#66000000</color>
+   <color name="colorPrimary">#003555</color>
+   <color name="colorPrimaryDark">#263238</color>
+   <color name="colorAccent">#003555</color>
+
+   <color name="dark_ripple">#37474F</color>
+   <color name="black_overlay">#000000</color>
 </resources>
