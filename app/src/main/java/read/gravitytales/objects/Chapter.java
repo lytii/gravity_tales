@@ -6,7 +6,7 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity
 public class Chapter {
 
-   private String bookTitle;
+   private int bookId;
 
    @PrimaryKey
    private long id;
@@ -34,12 +34,12 @@ public class Chapter {
       return url;
    }
 
-   public String getBookTitle() {
-      return bookTitle;
+   public int getBookId() {
+      return bookId;
    }
 
-   public void setBookTitle(String bookTitle) {
-      this.bookTitle = bookTitle;
+   public void setBookId(int bookId) {
+      this.bookId = bookId;
    }
 
    public void setUrl(String url) {

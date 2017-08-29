@@ -18,8 +18,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import read.gravitytales.objects.Book;
 
 import static android.content.ContentValues.TAG;
 import static read.gravitytales.R.style.noTitleDialog;
@@ -36,6 +39,11 @@ public class ReadActivity extends AppCompatActivity {
 
    @BindView(R.id.toolbar)
    Toolbar toolbar;
+
+   @BindView(R.id.loading_bar)
+   ProgressBar progressBar;
+
+   AlertDialog.Builder bookDialog;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -62,19 +70,17 @@ public class ReadActivity extends AppCompatActivity {
                case MotionEvent.ACTION_UP:
                   float deltaY = motionEvent.getY() - downY;
                   float deltaX = motionEvent.getX() - downX;
-                  Log.d(TAG, "onTouch: delta X " + deltaX + " Y " + deltaY);
                   // right to left (NEXT)
-                  if (deltaX <= -200 && Math.abs(deltaY) <= 50) {
-                     Log.d(TAG, "onTouch: swipe left");
+                  if (deltaX <= -150 && Math.abs(deltaY) <= 100) {
+                     Log.d(TAG, "onTouch: showNextChapter");
                      presenter.showNextChapter();
                   }
                   // left to right (PREV)
-                  if (deltaX >= 200 && Math.abs(deltaY) <= 50) {
-                     Log.d(TAG, "onTouch: swipe right");
+                  if (deltaX >= 150 && Math.abs(deltaY) <= 100) {
+                     Log.d(TAG, "onTouch: showPrevChapter");
                      presenter.showPrevChapter();
                   }
                case MotionEvent.ACTION_DOWN:
-                  Log.d(TAG, "onTouch: down");
                   downX = motionEvent.getX();
                   downY = motionEvent.getY();
             }
@@ -132,26 +138,24 @@ public class ReadActivity extends AppCompatActivity {
 
    public void changeBook() {
       final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-      AlertDialog.Builder alert = new AlertDialog.Builder(this, noTitleDialog);
+      bookDialog = new AlertDialog.Builder(this, noTitleDialog);
       final EditText input = new EditText(this);
       input.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS);
-      alert.setTitle("Enter Book Address");
-      alert.setView(input);
-      alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+      bookDialog.setTitle("Enter Book Address");
+      bookDialog.setView(input);
+      bookDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
          public void onClick(DialogInterface dialog, int whichButton) {
             presenter.changeBook(input.getText().toString());
-            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+            imm.hideSoftInputFromInputMethod(input.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
          }
       });
-      alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+      bookDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
          public void onClick(DialogInterface dialog, int whichButton) {
-            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+            imm.hideSoftInputFromInputMethod(input.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
          }
       });
-      alert.show();
-
-      input.requestFocus();
-      imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+      bookDialog.show();
+      imm.showSoftInputFromInputMethod(input.getWindowToken(), 0);
 
    }
 
@@ -178,27 +182,24 @@ public class ReadActivity extends AppCompatActivity {
          public void onClick(DialogInterface dialog, int whichButton) {
             int chapter = Integer.parseInt(input.getText().toString());
             presenter.jumpToChapter(chapter);
-            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+            imm.hideSoftInputFromInputMethod(input.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
          }
       });
       alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
          public void onClick(DialogInterface dialog, int whichButton) {
-            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+            imm.hideSoftInputFromInputMethod(input.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
          }
       });
       alert.show();
 
-      input.requestFocus();
-      imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+      imm.showSoftInputFromInputMethod(input.getWindowToken(), 0);
    }
 
    public void showLoading() {
-      ProgressBar progressBar = (ProgressBar) findViewById(R.id.loading_bar);
       progressBar.setVisibility(View.VISIBLE);
    }
 
    public void doneLoading() {
-      ProgressBar progressBar = (ProgressBar) findViewById(R.id.loading_bar);
       progressBar.setVisibility(View.INVISIBLE);
    }
 

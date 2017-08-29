@@ -1,12 +1,19 @@
 package read.gravitytales;
 
 
+import org.jsoup.Jsoup;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
 import io.reactivex.Maybe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.ResponseBody;
+import read.gravitytales.objects.Book;
 import read.gravitytales.objects.Chapter;
 import read.gravitytales.objects.ChapterDAO;
 import read.gravitytales.objects.ChapterListingParagraphs;
@@ -23,11 +30,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class BookManager {
 
-   private int currentChapter = 1;
    private ReadPresenter readPresenter;
    private ChapterDAO chapterDAO;
    private boolean autoLoad = false;
    BookNetwork bookNetwork;
+   Book currentBook;
+
+   private int currentChapter = 1;
 
    public BookManager(ReadPresenter readPresenter) {
       this.readPresenter = readPresenter;
@@ -44,19 +53,33 @@ public class BookManager {
       return currentChapter;
    }
 
-   public void changeBook(String bookUrl) {
-//      this.bookUrl = bookUrl;
+   public void changeBook(String bookUrl, int chapter) {
+      chapterDAO.getBookByUrl(bookUrl)
+                .subscribeOn(Schedulers.io())
+                .onErrorReturn(throwable -> {
+                   Book book = new Book();
+                   book.setBookUrl(bookUrl);
+                   book.setId(new Random().nextInt());
+                   chapterDAO.addBook(book);
+                   return book;
+                })
+                .subscribe(book -> {
+                   currentBook = book;
+                   readPresenter.bookmarkBook(book.getBookUrl());
+                   jumpToChapter(chapter);
+                });
    }
-
    /**
     * load chapter from cache to display chapter
     */
    private void loadChapter(int number) {
-      chapterDAO.getChapter(number)
+      chapterDAO.getChapter(number, currentBook.getId())
                 .toObservable()
                 .subscribeOn(Schedulers.io())
                 .switchIfEmpty(
-                      bookNetwork.getESPChapter(number)
+                      bookNetwork.getChapter(currentBook.getBookUrl() + number)
+                                 .map(ResponseBody::string)
+                                 .map(Jsoup::parse)
                                  .map(ChapterParser::parse)
                                  .flatMapMaybe(paragraphList -> saveChapter(paragraphList, number))
                 )
@@ -74,7 +97,8 @@ public class BookManager {
    public Maybe<ChapterListingParagraphs> saveChapter(List<String> chapter, int number) {
       Chapter newChapter = new Chapter();
       newChapter.setNumber(number);
-      newChapter.setId(number);
+      newChapter.setId(currentBook.getId()*10000+number);
+      newChapter.setBookId(currentBook.getId());
 
       int i = 0;
       for (String text : chapter) {
@@ -84,24 +108,30 @@ public class BookManager {
          newParagraph.setId(new Random().nextInt());
          chapterDAO.addParagraph(newParagraph);
       }
-
       chapterDAO.addChapter(newChapter);
-      return chapterDAO.getChapter(number);
+      return chapterDAO.getChapter(number, currentBook.getId());
    }
 
    public void preLoadChapter() {
+      readPresenter.startLoadingStatus();
       int number = currentChapter + 1;
-      bookNetwork.getESPChapter(number)
-                 .map(ChapterParser::parse)
-                 .flatMapMaybe(paragraphList -> saveChapter(paragraphList, number))
-                 .observeOn(AndroidSchedulers.mainThread())
-                 .subscribe(savedChapter ->
-                            {
-                               if (autoLoad) {
-                                  displayChapter(savedChapter);
-                               }
-                               readPresenter.endLoadingStatus();
-                            }, readPresenter::makeLoadingErrorToast);
+      chapterDAO.getChapter(number, currentBook.getId())
+                .toObservable()
+                .subscribeOn(Schedulers.io())
+                .switchIfEmpty(
+                      bookNetwork.getChapter(currentBook.getBookUrl() + number)
+                                 .map(ResponseBody::string)
+                                 .map(Jsoup::parse)
+                                 .map(ChapterParser::parse)
+                                 .flatMapMaybe(paragraphList -> saveChapter(paragraphList, number))
+                ).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(savedChapter -> {
+         if (autoLoad) {
+            displayChapter(savedChapter);
+         } else {
+            readPresenter.endLoadingStatus();
+         }
+      }, readPresenter::makeLoadingErrorToast);
    }
 
    public void jumpToChapter(int chapter) {

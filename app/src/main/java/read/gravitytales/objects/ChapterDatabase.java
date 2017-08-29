@@ -5,7 +5,7 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
-@Database(entities = {Chapter.class, Paragraph.class}, version = 1)
+@Database(entities = {Book.class, Chapter.class, Paragraph.class}, version = 1)
 public abstract class ChapterDatabase extends RoomDatabase {
 
    private static ChapterDatabase INSTANCE;

@@ -12,14 +12,23 @@ import io.reactivex.Single;
 @Dao
 public interface ChapterDAO {
 
+   @Query("SELECT * FROM Book")
+   Single<List<Book>> getBooks();
+
+   @Query("SELECT * FROM Book where bookUrl LIKE :bookUrl")
+   Single<Book> getBookByUrl(String bookUrl);
+
+   @Query("SELECT * FROM Book where id = :bookId")
+   Single<Book> getBook(int bookId);
+
    @Query("SELECT * FROM Chapter where url LIKE :url")
    Chapter getParagraph(String url);
 
-   @Query("SELECT * FROM Chapter where bookTitle LIKE :title")
-   List<Chapter> getBook(String title);
+   @Query("SELECT * FROM Chapter where number = :number AND bookId = :bookId" )
+   Maybe<ChapterListingParagraphs> getChapter(int number, int bookId);
 
-   @Query("SELECT * FROM Chapter where number = :number" )
-   Maybe<ChapterListingParagraphs> getChapter(int number);
+   @Insert
+   void addBook(Book book);
 
    @Insert
    void addChapter(Chapter chapter);

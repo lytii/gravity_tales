@@ -16,24 +16,25 @@ import read.gravitytales.objects.Paragraph;
 
 public final class ChapterParser {
 
-   public static ArrayList<String> parse(ResponseBody responseBody) throws IOException {
+   public static ArrayList<String> parse(Document toParse) throws IOException {
       // parse response to get chapter text
-      Document toParse = Jsoup.parse(responseBody.string());
       Elements chapterContent = toParse.select("div#chapterContent");
       if (chapterContent.size() == 0) // backup parsing
          chapterContent = toParse.select("div [itemprop='articleBody']");
+      System.out.println(chapterContent);
       List<Node> all = chapterContent.get(0).childNodes();
 
       ArrayList<String> paragraphs = removeBlanks(all);
 
       // remove if first line is `Next Chapter Previous Chapter`
       if (paragraphs.get(0).contains("Next Chapter") || paragraphs.get(0).contains("Previous Chapter")) {
-         String title = paragraphs.get(0);
-         Elements spanSelect = Jsoup.parse(title).select("span");
-         if (spanSelect.size() == 2)
+         Element title = Jsoup.parse(paragraphs.get(0));
+         Elements spanSelect = title.select("span");
+         if (spanSelect.size() == 2) {
             paragraphs.set(0, spanSelect.get(1).toString());
-         else
+         } else {
             paragraphs.remove(0);
+         }
       }
 
       // add title as first

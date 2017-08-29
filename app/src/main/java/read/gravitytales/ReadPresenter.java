@@ -9,6 +9,8 @@ import android.text.Html;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.Arrays;
+
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import read.gravitytales.objects.ChapterDAO;
@@ -32,13 +34,19 @@ public class ReadPresenter {
       initializeStuff(); // using readActivity
 
       // Load last seen chapter
-      int currentChapter = sharedPreferences.getInt("Current Chapter", 58);
-      bookManager.jumpToChapter(currentChapter);
+      int currentChapter = sharedPreferences.getInt(readActivity.getString(R.string.chapter_store), 161);
+      String currentBookUrl = sharedPreferences.getString(readActivity.getString(R.string.book_url_store), "https://www.wuxiaworld.com/ssn-index/ssn-chapter-");
+      bookManager.changeBook(currentBookUrl, currentChapter);
       setScroll();
    }
 
    public void changeBook(String bookUrl) {
-      bookManager.changeBook(bookUrl);
+      startLoadingStatus();
+      String[] urlPieces = bookUrl.split("-|/");
+      String numberString = urlPieces[urlPieces.length - 1];
+      // trim chapter number
+      String baseUrl = bookUrl.substring(0, bookUrl.indexOf(numberString));
+      bookManager.changeBook(baseUrl, Integer.parseInt(numberString));
    }
 
    /**
@@ -70,11 +78,21 @@ public class ReadPresenter {
     * @param chapterNumber
     */
    public void bookmarkChapter(int chapterNumber) {
-      sharedPreferences.edit().putInt("Current Chapter", chapterNumber).apply();
+      sharedPreferences.edit()
+                       .putInt(readActivity.getString(R.string.chapter_store), chapterNumber)
+                       .apply();
+   }
+
+   public void bookmarkBook(String bookUrl) {
+      sharedPreferences.edit()
+                       .putString(readActivity.getString(R.string.book_url_store), bookUrl)
+                       .apply();
    }
 
    public void markScroll(int scrollPosition) {
-      sharedPreferences.edit().putInt("Current Scroll", scrollPosition).apply();
+      sharedPreferences.edit()
+                       .putInt(readActivity.getString(R.string.scroll_store), scrollPosition)
+                       .apply();
    }
 
    public void setScroll() {
@@ -101,8 +119,6 @@ public class ReadPresenter {
       if (!loading) {
          bookManager.showNextChapter();
          startLoadingStatus();
-      } else {
-
       }
    }
 
@@ -132,7 +148,7 @@ public class ReadPresenter {
 
    public void makeLoadingErrorToast(Throwable throwable) {
       endLoadingStatus();
-      Log.d(TAG, "makeLoadingErrorToast: " + throwable);
+      Log.d(TAG, "makeLoadingErrorToast: " + Arrays.toString(throwable.getStackTrace()));
       Toast.makeText(readActivity, "Error: " + throwable, Toast.LENGTH_SHORT).show();
    }
 

@@ -3,4 +3,7 @@
 
    <string name="dummy_button">Dummy Button</string>
    <string name="dummy_content">DUMMY\nCONTENT</string>
+   <string name="chapter_store">Current Chapter</string>
+   <string name="book_url_store">https://www.wuxiaworld.com/ssn-index/ssn-chapter-</string>
+   <string name="scroll_store">Current Scroll</string>
 </resources>
